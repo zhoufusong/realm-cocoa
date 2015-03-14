@@ -66,11 +66,11 @@
 }
 
 - (id)objectForKeyedSubscript:(NSString *)key {
-    return RLMObjectBaseObjectForKeyedSubscript(self, key);
+    return [super objectForKeyedSubscript:key];
 }
 
 - (void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
-    RLMObjectBaseSetObjectForKeyedSubscript(self, key, obj);
+    [super setObject:obj forKeyedSubscript:key];
 }
 
 - (RLMRealm *)realm {

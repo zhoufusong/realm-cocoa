@@ -20,7 +20,7 @@
 
 #import "RLMArray.h"
 #import "RLMListBase.h"
-#import "RLMObject_Private.h"
+#import "RLMObject.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
