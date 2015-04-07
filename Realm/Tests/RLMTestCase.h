@@ -32,6 +32,8 @@ NSData *RLMGenerateKey(void);
 
 @interface RLMTestCase : XCTestCase
 
+- (RLMRealm *)realmWithPath:(NSString *)path;
+- (RLMRealm *)realmWithPath:(NSString *)path readOnly:(BOOL)readOnly error:(NSError **)error;
 - (RLMRealm *)realmWithTestPath;
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
 

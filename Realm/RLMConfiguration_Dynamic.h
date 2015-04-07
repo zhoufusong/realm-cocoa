@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,24 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMRealm.h>
+#import <Realm/RLMConfiguration.h>
 
-@class RLMNotifier;
+@class RLMSchema;
 
-// RLMRealm private members
-@interface RLMRealm () {
-    @public
-    // expose ivar to to avoid objc messages in accessors
-    BOOL _inWriteTransaction;
-    mach_port_t _threadID;
-}
-@property (nonatomic, readonly) BOOL inWriteTransaction;
-@property (nonatomic, readonly) BOOL dynamic;
-@property (nonatomic, readwrite) RLMSchema *schema;
-@property (nonatomic, strong) RLMNotifier *notifier;
+@interface RLMConfiguration (Dynamic)
 
-+ (void)resetRealmState;
-
-- (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory dynamic:(BOOL)dynamic error:(NSError **)error;
+@property (nonatomic)       BOOL       dynamic;
+@property (nonatomic, copy) RLMSchema *customSchema;
 
 @end

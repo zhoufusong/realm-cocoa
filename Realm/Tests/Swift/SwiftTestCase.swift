@@ -56,17 +56,28 @@ func deleteRealmFilesAtPath(path: String) {
 }
 
 func realmWithTestPathAndSchema(schema: RLMSchema?) -> RLMRealm {
-    return RLMRealm(path: testRealmPath(), key: nil, readOnly: false, inMemory: false, dynamic: false, schema: schema, error: nil)
+    return RLMRealm(configuration: RLMConfiguration() { configurator in
+            configurator.path = testRealmPath()
+            let configuration = configurator as AnyObject as RLMConfiguration
+            configuration.customSchema = schema
+        })
 }
 
 func dynamicRealmWithTestPathAndSchema(schema: RLMSchema?) -> RLMRealm {
-    return RLMRealm(path: testRealmPath(), key: nil, readOnly: false, inMemory: false, dynamic: true, schema: schema, error: nil)
+    return RLMRealm(configuration: RLMConfiguration() { configurator in
+            configurator.path = testRealmPath()
+            let configuration = configurator as AnyObject as RLMConfiguration
+            configuration.dynamic = true
+            configuration.customSchema = schema
+        })
 }
 
 class SwiftTestCase: XCTestCase {
 
     func realmWithTestPath() -> RLMRealm {
-        return RLMRealm(path: testRealmPath(), readOnly: false, error: nil)
+        return RLMRealm(configuration: RLMConfiguration() { configurator in
+                configurator.path = testRealmPath()
+            })
     }
 
     override func setUp() {

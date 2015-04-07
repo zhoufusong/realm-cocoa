@@ -28,29 +28,29 @@
 @implementation EncryptionTests
 
 - (RLMRealm *)realmWithKey:(NSData *)key {
-    return [RLMRealm realmWithPath:RLMDefaultRealmPath()
-                     encryptionKey:key
-                          readOnly:NO
-                             error:nil];
+    return [self realmWithPath:RLMDefaultRealmPath() encryptionKey:key];
+}
+
+- (RLMRealm *)realmWithPath:(NSString *)path encryptionKey:(NSData *)key {
+    return [RLMRealm realmWithConfiguration:[RLMConfiguration configurationWithBlock:^(id<RLMConfigurator> configurator) {
+        configurator.path = path;
+        configurator.encryptionKey = key;
+    }]];
 }
 
 #pragma mark - Key validation
 
 - (void)testBadEncryptionKeys {
-    XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:nil readOnly:NO error:nil]);
-    XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:NSData.data readOnly:NO error:nil]);
+    XCTAssertThrows([self realmWithPath:RLMRealm.defaultRealmPath encryptionKey:nil]);
+    XCTAssertThrows([self realmWithPath:RLMRealm.defaultRealmPath encryptionKey:NSData.data]);
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:nil]);
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:NSData.data]);
-    XCTAssertThrows([RLMRealm setEncryptionKey:NSData.data forRealmsAtPath:RLMRealm.defaultRealmPath]);
     XCTAssertThrows([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:nil error:nil]);
     XCTAssertThrows([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:NSData.data error:nil]);
 }
 
 - (void)testValidEncryptionKeys {
     NSData *key = [[NSMutableData alloc] initWithLength:64];
-    XCTAssertNoThrow([RLMRealm setEncryptionKey:key
-                                forRealmsAtPath:RLMRealm.defaultRealmPath]);
-    XCTAssertNoThrow([RLMRealm setEncryptionKey:nil forRealmsAtPath:RLMRealm.defaultRealmPath]);
     XCTAssertNoThrow([RLMRealm.defaultRealm writeCopyToPath:RLMTestRealmPath() encryptionKey:key error:nil]);
 }
 

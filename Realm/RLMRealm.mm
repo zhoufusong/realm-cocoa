@@ -19,6 +19,7 @@
 #import "RLMRealm_Private.hpp"
 
 #import "RLMArray_Private.hpp"
+#import <Realm/RLMConfiguration_Dynamic.h>
 #import "RLMMigration_Private.h"
 #import "RLMObject_Private.h"
 #import "RLMObjectSchema_Private.hpp"
@@ -124,9 +125,6 @@ static void clearMigrationCache() {
     }
 }
 
-static NSString *s_defaultRealmPath = nil;
-static NSString * const c_defaultRealmFileName = @"default.realm";
-
 @implementation RLMRealm {
     // Used for read-write realms
     NSHashTable *_notificationHandlers;
@@ -228,105 +226,29 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     return _group;
 }
 
-+ (NSString *)defaultRealmPath
-{
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        if (!s_defaultRealmPath) {
-            s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
-        }
-    });
-    return s_defaultRealmPath;
-}
-
-+ (void)setDefaultRealmPath:(NSString *)defaultRealmPath {
-    s_defaultRealmPath = defaultRealmPath;
-}
-
-+ (NSString *)writeablePathForFile:(NSString*)fileName
-{
-#if TARGET_OS_IPHONE
-    // On iOS the Documents directory isn't user-visible, so put files there
-    NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
-#else
-    // On OS X it is, so put files in Application Support. If we aren't running
-    // in a sandbox, put it in a subdirectory based on the bundle identifier
-    // to avoid accidentally sharing files between applications
-    NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
-    if (![[NSProcessInfo processInfo] environment][@"APP_SANDBOX_CONTAINER_ID"]) {
-        NSString *identifier = [[NSBundle mainBundle] bundleIdentifier];
-        if ([identifier length] == 0) {
-            identifier = [[[NSBundle mainBundle] executablePath] lastPathComponent];
-        }
-        path = [path stringByAppendingPathComponent:identifier];
-
-        // create directory
-        [[NSFileManager defaultManager] createDirectoryAtPath:path
-                                  withIntermediateDirectories:YES
-                                                   attributes:nil
-                                                        error:nil];
-    }
-#endif
-    return [path stringByAppendingPathComponent:fileName];
-}
-
 + (instancetype)defaultRealm
 {
-    return [RLMRealm realmWithPath:[RLMRealm defaultRealmPath] readOnly:NO error:nil];
+    return [self realmWithConfiguration:[RLMConfiguration defaultConfiguration]];
 }
 
-+ (instancetype)realmWithPath:(NSString *)path
-{
-    return [self realmWithPath:path readOnly:NO error:nil];
++ (instancetype)realmWithConfiguration:(RLMConfiguration *)configuration {
+    return [self realmWithConfiguration:configuration error:nil];
 }
 
-+ (instancetype)realmWithPath:(NSString *)path
-                     readOnly:(BOOL)readonly
-                        error:(NSError **)outError
-{
-    return [self realmWithPath:path key:nil readOnly:readonly inMemory:NO dynamic:NO schema:nil error:outError];
-}
-
-+ (instancetype)inMemoryRealmWithIdentifier:(NSString *)identifier {
-    return [self realmWithPath:[RLMRealm writeablePathForFile:identifier] key:nil
-                      readOnly:NO inMemory:YES dynamic:NO schema:nil error:nil];
-}
-
-+ (instancetype)realmWithPath:(NSString *)path
-                encryptionKey:(NSData *)key
-                     readOnly:(BOOL)readonly
-                        error:(NSError **)error
-{
-    if (!key) {
-        @throw RLMException(@"Encryption key must not be nil");
-    }
-
-    return [self realmWithPath:path key:key readOnly:readonly inMemory:NO dynamic:NO schema:nil error:error];
-}
-
-// ARC tries to eliminate calls to autorelease when the value is then immediately
-// returned, but this results in significantly different semantics between debug
-// and release builds for RLMRealm, so force it to always autorelease.
-static id RLMAutorelease(id value) {
-    // +1 __bridge_retained, -1 CFAutorelease
-    return value ? (__bridge id)CFAutorelease((__bridge_retained CFTypeRef)value) : nil;
-}
-
-+ (instancetype)realmWithPath:(NSString *)path
-                          key:(NSData *)key
-                     readOnly:(BOOL)readonly
-                     inMemory:(BOOL)inMemory
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-                        error:(NSError **)outError
-{
++ (instancetype)realmWithConfiguration:(RLMConfiguration *)configuration error:(NSError **)outError {
+    bool dynamic = configuration.dynamic;
+    bool readonly = configuration.readonly;
+    bool inMemory = !!configuration.inMemoryIdentifier;
+    NSString *path = inMemory ? configuration.inMemoryIdentifier : configuration.path;
+    RLMSchema *customSchema = configuration.customSchema;
+    NSData *key = configuration.encryptionKey;
     if (!path || path.length == 0) {
         @throw RLMException(@"Path is not valid", @{@"path":(path ?: @"nil")});
     }
 
     if (![NSRunLoop currentRunLoop]) {
         @throw RLMException([NSString stringWithFormat:@"%@ \
-                                               can only be called from a thread with a runloop.",
+                             can only be called from a thread with a runloop.",
                              NSStringFromSelector(_cmd)]);
     }
 
@@ -404,8 +326,16 @@ static id RLMAutorelease(id value) {
             return nil;
         }
     }
-
+    
     return RLMAutorelease(realm);
+}
+
+// ARC tries to eliminate calls to autorelease when the value is then immediately
+// returned, but this results in significantly different semantics between debug
+// and release builds for RLMRealm, so force it to always autorelease.
+static id RLMAutorelease(id value) {
+    // +1 __bridge_retained, -1 CFAutorelease
+    return value ? (__bridge id)CFAutorelease((__bridge_retained CFTypeRef)value) : nil;
 }
 
 - (NSError *(^)())migrationBlock:(NSData *)encryptionKey {
@@ -437,7 +367,7 @@ static id RLMAutorelease(id value) {
     clearMigrationCache();
     clearKeyCache();
     RLMClearRealmCache();
-    s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
+    [RLMConfiguration setDefaultConfiguration:[[RLMConfiguration alloc] init]];
 }
 
 static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a read-only Realm") {
@@ -771,7 +701,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (void)setDefaultRealmSchemaVersion:(NSUInteger)version withMigrationBlock:(RLMMigrationBlock)block {
-    [RLMRealm setSchemaVersion:version forRealmAtPath:[RLMRealm defaultRealmPath] withMigrationBlock:block];
+    [RLMRealm setSchemaVersion:version forRealmAtPath:[RLMConfiguration defaultConfiguration].path withMigrationBlock:block];
 }
 
 + (void)setSchemaVersion:(NSUInteger)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(RLMMigrationBlock)block {

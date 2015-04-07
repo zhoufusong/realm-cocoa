@@ -18,14 +18,9 @@
 
 #import "RLMTestCase.h"
 
+#import "RLMConfiguration_Dynamic.h"
+
 @interface RLMRealm ()
-+ (instancetype)realmWithPath:(NSString *)path
-                          key:(NSData *)key
-                     readOnly:(BOOL)readonly
-                     inMemory:(BOOL)inMemory
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-                        error:(NSError **)outError;
 + (void)resetRealmState;
 @end
 
@@ -88,11 +83,11 @@ static BOOL encryptTests() {
         [super setUp];
         [self deleteFiles];
 
-        if (encryptTests()) {
-            [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMDefaultRealmPath()];
-            [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMTestRealmPath()];
+//    if (encryptTests()) {
+//        [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMDefaultRealmPath()];
+//        [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMTestRealmPath()];
         }
-    }
+//    }
 }
 
 - (void)tearDown {
@@ -117,13 +112,28 @@ static BOOL encryptTests() {
     }
 }
 
+- (RLMRealm *)realmWithPath:(NSString *)path {
+    return [self realmWithPath:path readOnly:NO error:nil];
+}
+
+- (RLMRealm *)realmWithPath:(NSString *)path readOnly:(BOOL)readOnly error:(NSError **)error {
+    return [RLMRealm realmWithConfiguration:[RLMConfiguration configurationWithBlock:^(id<RLMConfigurator> configurator) {
+        configurator.path = path;
+        configurator.readonly = readOnly;
+    }] error:error];
+}
+
 - (RLMRealm *)realmWithTestPath
 {
-    return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+    return [self realmWithTestPathAndSchema:nil];
 }
 
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema {
-    return [RLMRealm realmWithPath:RLMTestRealmPath() key:nil readOnly:NO inMemory:NO dynamic:YES schema:schema error:nil];
+    return [RLMRealm realmWithConfiguration:[RLMConfiguration configurationWithBlock:^(RLMConfiguration<RLMConfigurator> *configurator) {
+        configurator.customSchema = schema;
+        configurator.path = RLMTestRealmPath();
+        configurator.dynamic = !!schema;
+    }]];
 }
 
 - (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block {

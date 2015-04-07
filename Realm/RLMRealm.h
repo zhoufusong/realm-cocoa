@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
+@class RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMConfiguration;
 
 /**
  An RLMRealm instance (also referred to as "a realm") represents a Realm
@@ -48,6 +48,7 @@
  *  @name Creating & Initializing a Realm
  * ---------------------------------------------------------------------------------------
  */
+
 /**
  Obtains an instance of the default Realm.
 
@@ -61,93 +62,10 @@
  */
 + (instancetype)defaultRealm;
 
-/**
- Obtains an `RLMRealm` instance persisted at a specific file path.
++ (instancetype)realmWithConfiguration:(RLMConfiguration *)configuration;
 
- @param path Path to the file you want the data saved in.
++ (instancetype)realmWithConfiguration:(RLMConfiguration *)configuration error:(NSError **)error;
 
- @return An `RLMRealm` instance.
- */
-+ (instancetype)realmWithPath:(NSString *)path;
-
-/**
- Obtains an `RLMRealm` instance with persistence to a specific file path with
- options.
-
- Like `realmWithPath:`, but with the ability to open read-only realms and get
- errors as an `NSError` inout parameter rather than exceptions.
-
- @warning Read-only Realms do not support changes made to the file while the
- `RLMRealm` exists. This means that you cannot open a Realm as both read-only
- and read-write at the same time. Read-only Realms should normally only be used
- on files which cannot be opened in read-write mode, and not just for enforcing
- correctness in code that should not need to write to the Realm.
-
- @param path        Path to the file you want the data saved in.
- @param readonly    BOOL indicating if this Realm is read-only (must use for read-only files)
- @param error       If an error occurs, upon return contains an `NSError` object
-                    that describes the problem. If you are not interested in
-                    possible errors, pass in `NULL`.
-
- @return An `RLMRealm` instance.
- */
-+ (instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
-
-/**
- Obtains an `RLMRealm` instance persisted to an encrypted file.
-
- The on-disk storage for encrypted Realms are encrypted using AES256+HMAC-SHA2,
- but otherwise they behave like normal persisted Realms.
-
- @param path        Path to the file you want the data saved in.
- @param key         64-byte key to use to encrypt the data.
- @param readonly    BOOL indicating if this Realm is read-only (must use for read-only files)
- @param error       If an error occurs, upon return contains an `NSError` object
-                    that describes the problem. If you are not interested in
-                    possible errors, pass in `NULL`.
-
- @return An encrypted `RLMRealm` instance.
- */
-+ (instancetype)realmWithPath:(NSString *)path
-                encryptionKey:(NSData *)key
-                     readOnly:(BOOL)readonly
-                        error:(NSError **)error;
-
-/**
- Set the encryption key to use when opening Realms at a certain path.
-
- This can be used as an alternative to explicitly passing the key to
- `realmWithPath:key:readOnly:error:` each time a Realm instance is
- needed. The encryption key will be used any time a Realm is opened with
- `realmWithPath:` or `defaultRealm`.
-
- If you do not want Realm to hold on to your encryption keys any longer than
- needed, then use `realmWithPath:encryptionKey:readOnly:error:` rather than this
- method.
-
- @param key     64-byte encryption key to use, or `nil` to unset.
- @param path    Realm path to set the encryption key for.
- */
-+ (void)setEncryptionKey:(NSData *)key forRealmsAtPath:(NSString *)path;
-
-/**
- Obtains an `RLMRealm` instance for an un-persisted in-memory Realm. The identifier
- used to create this instance can be used to access the same in-memory Realm from
- multiple threads.
-
- Because in-memory Realms are not persisted, you must be sure to hold on to a
- reference to the `RLMRealm` object returned from this for as long as you want
- the data to last. Realm's internal cache of `RLMRealm`s will not keep the
- in-memory Realm alive across cycles of the run loop, so without a strong
- reference to the `RLMRealm` a new Realm will be created each time. Note that
- `RLMObject`s, `RLMArray`s, and `RLMResults` that refer to objects persisted in a Realm have a
- strong reference to the relevant `RLMRealm`, as do `RLMNotifcationToken`s.
-
- @param identifier  A string used to identify a particular in-memory Realm.
-
- @return An `RLMRealm` instance.
- */
-+ (instancetype)inMemoryRealmWithIdentifier:(NSString *)identifier;
 
 /**
  Path to the file where this Realm is persisted.
@@ -163,33 +81,6 @@
  The RLMSchema used by this RLMRealm.
  */
 @property (nonatomic, readonly) RLMSchema *schema;
-
-/**---------------------------------------------------------------------------------------
- *  @name Default Realm Path
- * ---------------------------------------------------------------------------------------
- */
-/**
- Returns the location of the default Realm as a string.
-
- `~/Application Support/{bundle ID}/default.realm` on OS X.
-
- `default.realm` in your application's documents directory on iOS.
-
- @return Location of the default Realm.
-
- @see defaultRealm
- */
-+ (NSString *)defaultRealmPath;
-
-/**
- Set the default Realm path to a given path.
-
- @param defaultRealmPath    The path to use for the default Realm.
-
- @see defaultRealm
- */
-+ (void)setDefaultRealmPath:(NSString *)defaultRealmPath;
-
 
 #pragma mark - Notifications
 

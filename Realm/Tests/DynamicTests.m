@@ -18,6 +18,7 @@
 
 #import "RLMTestCase.h"
 #import "RLMRealm_Dynamic.h"
+#import "RLMConfiguration_Dynamic.h"
 #import "RLMSchema_Private.h"
 
 @interface DynamicTests : RLMTestCase
@@ -30,7 +31,7 @@
 - (void)testDynamicRealmExists {
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
-        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+        RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
         [DynamicObject createInRealm:realm withObject:@[@"column1", @1]];
         [DynamicObject createInRealm:realm withObject:@[@"column2", @2]];
@@ -64,7 +65,11 @@
     XCTAssertNotNil(expectedSchema);
 
     NSError *error = nil;
-    RLMSchema *dynamicSchema = [[RLMRealm realmWithPath:RLMTestRealmPath() key:nil readOnly:NO inMemory:NO dynamic:YES schema:nil error:&error] schema];
+    RLMRealm *dynamicRealm = [RLMRealm realmWithConfiguration:[RLMConfiguration configurationWithBlock:^(RLMConfiguration<RLMConfigurator> *configurator) {
+        configurator.path = RLMTestRealmPath();
+        configurator.dynamic = YES;
+    }] error:&error];
+    RLMSchema *dynamicSchema = [dynamicRealm schema];
     XCTAssertNil(error);
     XCTAssertEqual(dynamicSchema.objectSchema.count, expectedSchema.objectSchema.count);
     for (RLMObjectSchema *expectedObjectSchema in expectedSchema.objectSchema) {
@@ -94,7 +99,7 @@
 - (void)testDynamicProperties {
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
-        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+        RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
         [DynamicObject createInRealm:realm withObject:@[@"column1", @1]];
         [DynamicObject createInRealm:realm withObject:@[@"column2", @2]];
@@ -120,7 +125,7 @@
     id obj2 = @[@NO, @2, @2.2f, @2.22, @"string2", [NSData dataWithBytes:"b" length:1], now, @NO, @22, now, obj];
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
-        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+        RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
         [AllTypesObject createInRealm:realm withObject:obj1];
         [AllTypesObject createInRealm:realm withObject:obj2];
@@ -152,7 +157,7 @@
 - (void)testDynamicAdd {
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
-        [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+        [self realmWithTestPath];
     }
 
     RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];
@@ -169,7 +174,7 @@
 - (void)testDynamicArray {
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
-        [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+        [self realmWithTestPath];
     }
 
     RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];

@@ -25,15 +25,6 @@
 
 @interface RLMRealm (Dynamic)
 
-// full constructor
-+ (instancetype)realmWithPath:(NSString *)path
-                          key:(NSData *)key
-                     readOnly:(BOOL)readonly
-                     inMemory:(BOOL)inMemory
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-                        error:(NSError **)outError;
-
 /**---------------------------------------------------------------------------------------
  *  @name Getting Objects from a Realm
  * ---------------------------------------------------------------------------------------
