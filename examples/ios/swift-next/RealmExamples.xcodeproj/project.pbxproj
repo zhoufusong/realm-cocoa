@@ -17,6 +17,8 @@
 		029996801A7D56D30021BB86 /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0299966C1A7D4C820021BB86 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		029996831A7D56DA0021BB86 /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0299966C1A7D4C820021BB86 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		029996861A7D56E20021BB86 /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0299966C1A7D4C820021BB86 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		29D836B91AD567E10041BEF8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D836B81AD567E10041BEF8 /* AppDelegate.swift */; };
+		29D836E91AD575430041BEF8 /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0299966C1A7D4C820021BB86 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3FC898FF1A1414110067CBEC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FE1A1414110067CBEC /* ViewController.swift */; };
 		E886FB591A12A6FC00CB2D0B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		E886FB671A12A73E00CB2D0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E886FB631A12A73E00CB2D0B /* AppDelegate.swift */; };
@@ -113,9 +115,33 @@
 			remoteGlobalIDString = 023B19A71A4234380067FB81;
 			remoteInfo = "RealmSwift iOS";
 		};
+		29D836DB1AD567E10041BEF8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 029996611A7D4C820021BB86 /* RealmSwift.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C0E04FAB1AB2366200DCC8C0;
+			remoteInfo = TestHost;
+		};
+		29D836EA1AD575530041BEF8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 029996611A7D4C820021BB86 /* RealmSwift.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 023B19A71A4234380067FB81;
+			remoteInfo = "RealmSwift iOS";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		29D836DF1AD5750F0041BEF8 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				29D836E91AD575430041BEF8 /* RealmSwift.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C01304E31A60A4A000EB3E1E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -181,6 +207,9 @@
 /* Begin PBXFileReference section */
 		0295B91519D103A70036D6C3 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		029996611A7D4C820021BB86 /* RealmSwift.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RealmSwift.xcodeproj; path = ../../../RealmSwift.xcodeproj; sourceTree = "<group>"; };
+		29D836B41AD567E10041BEF8 /* REST.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = REST.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		29D836B71AD567E10041BEF8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		29D836B81AD567E10041BEF8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3FC898FE1A1414110067CBEC /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = ../../build/ios/RealmSwift.framework; sourceTree = "<group>"; };
 		E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -211,6 +240,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		29D836B11AD567E10041BEF8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E886FB581A12A6FC00CB2D0B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -280,8 +316,18 @@
 				029996701A7D4C820021BB86 /* RealmSwift.framework */,
 				029996721A7D4C820021BB86 /* RealmSwift OSX Tests.xctest */,
 				029996741A7D4C820021BB86 /* iOS Device Tests.xctest */,
+				29D836DC1AD567E10041BEF8 /* TestHost.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		29D836B51AD567E10041BEF8 /* REST */ = {
+			isa = PBXGroup;
+			children = (
+				29D836B81AD567E10041BEF8 /* AppDelegate.swift */,
+				29D836B71AD567E10041BEF8 /* Info.plist */,
+			);
+			path = REST;
 			sourceTree = "<group>";
 		};
 		E805758C19BA55E600376620 = {
@@ -292,6 +338,7 @@
 				E8CB087F19BA6AEE0018434A /* Encryption */,
 				E886FB621A12A73E00CB2D0B /* GroupedTableView */,
 				E8CB088419BA6AF70018434A /* Migration */,
+				29D836B51AD567E10041BEF8 /* REST */,
 				E805759619BA55E600376620 /* Products */,
 				0295B90519D103180036D6C3 /* RealmSwift */,
 				E8CB088F19BA6B000018434A /* Simple */,
@@ -308,6 +355,7 @@
 				E8CB081419BA6ABD0018434A /* Migration.app */,
 				E8CB085E19BA6ACA0018434A /* Simple.app */,
 				E8CB083919BA6AC60018434A /* TableView.app */,
+				29D836B41AD567E10041BEF8 /* REST.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -377,6 +425,25 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		29D836B31AD567E10041BEF8 /* REST */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 29D836DD1AD567E10041BEF8 /* Build configuration list for PBXNativeTarget "REST" */;
+			buildPhases = (
+				29D836B01AD567E10041BEF8 /* Sources */,
+				29D836B11AD567E10041BEF8 /* Frameworks */,
+				29D836B21AD567E10041BEF8 /* Resources */,
+				29D836DF1AD5750F0041BEF8 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				29D836EB1AD575530041BEF8 /* PBXTargetDependency */,
+			);
+			name = REST;
+			productName = REST;
+			productReference = 29D836B41AD567E10041BEF8 /* REST.app */;
+			productType = "com.apple.product-type.application";
+		};
 		E886FB511A12A6FC00CB2D0B /* GroupedTableView */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E886FB5D1A12A6FC00CB2D0B /* Build configuration list for PBXNativeTarget "GroupedTableView" */;
@@ -497,6 +564,9 @@
 				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
+					29D836B31AD567E10041BEF8 = {
+						CreatedOnToolsVersion = 6.2;
+					};
 					E8CB07EE19BA6AB60018434A = {
 						CreatedOnToolsVersion = 6.0;
 					};
@@ -537,6 +607,7 @@
 				E8CB07EE19BA6AB60018434A /* Encryption */,
 				E886FB511A12A6FC00CB2D0B /* GroupedTableView */,
 				E8CB081319BA6ABD0018434A /* Migration */,
+				29D836B31AD567E10041BEF8 /* REST */,
 				E8CB085D19BA6ACA0018434A /* Simple */,
 				E8CB083819BA6AC60018434A /* TableView */,
 			);
@@ -579,9 +650,23 @@
 			remoteRef = 029996731A7D4C820021BB86 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		29D836DC1AD567E10041BEF8 /* TestHost.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = TestHost.app;
+			remoteRef = 29D836DB1AD567E10041BEF8 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		29D836B21AD567E10041BEF8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E886FB5B1A12A6FC00CB2D0B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -611,6 +696,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		29D836B01AD567E10041BEF8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				29D836B91AD567E10041BEF8 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E886FB541A12A6FC00CB2D0B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -695,9 +788,41 @@
 			name = "RealmSwift iOS";
 			targetProxy = 029996841A7D56DF0021BB86 /* PBXContainerItemProxy */;
 		};
+		29D836EB1AD575530041BEF8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "RealmSwift iOS";
+			targetProxy = 29D836EA1AD575530041BEF8 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		29D836D01AD567E10041BEF8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = REST/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		29D836D11AD567E10041BEF8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COPY_PHASE_STRIP = NO;
+				INFOPLIST_FILE = REST/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		E80575AF19BA55E700376620 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -938,6 +1063,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		29D836DD1AD567E10041BEF8 /* Build configuration list for PBXNativeTarget "REST" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				29D836D01AD567E10041BEF8 /* Debug */,
+				29D836D11AD567E10041BEF8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E805759019BA55E600376620 /* Build configuration list for PBXProject "RealmExamples" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
