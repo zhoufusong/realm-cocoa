@@ -25,4 +25,6 @@
 @property (nonatomic)       BOOL       dynamic;
 @property (nonatomic, copy) RLMSchema *customSchema;
 
++ (NSString *)defaultRealmPath;
+
 @end

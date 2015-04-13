@@ -19,8 +19,6 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMRealm.h>
 
-@class RLMSchema;
-
 @protocol RLMConfigurator <NSObject>
 
 @property (nonatomic, copy) NSString *path;

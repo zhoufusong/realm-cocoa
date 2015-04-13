@@ -202,7 +202,7 @@ public final class Migration {
 
 // MARK: Private Helpers
 
-private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrationBlock {
+internal func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrationBlock {
     return { migration, oldVersion in
         // set all accessor classes to MigrationObject
         for objectSchema in migration.oldSchema.objectSchema {
