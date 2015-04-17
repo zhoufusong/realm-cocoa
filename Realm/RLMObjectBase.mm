@@ -29,19 +29,21 @@
 #import "RLMUtil.hpp"
 
 @implementation RLMObservable {
+    RLMRealm *_realm;
     RLMObjectSchema *_objectSchema;
 }
-- (instancetype)initWithRow:(realm::Row const&)row schema:(RLMObjectSchema *)objectSchema {
+- (instancetype)initWithRow:(realm::Row const&)row realm:(RLMRealm *)realm schema:(RLMObjectSchema *)objectSchema {
     self = [super init];
     if (self) {
         _row = row;
+        _realm = realm;
         _objectSchema = objectSchema;
     }
     return self;
 }
 
 - (id)valueForKey:(NSString *)key {
-    RLMObject *obj = [[RLMObject alloc] initWithRealm:RLMRealm.defaultRealm schema:_objectSchema];
+    RLMObject *obj = [[RLMObject alloc] initWithRealm:_realm schema:_objectSchema];
     obj->_row = _row;
     return RLMDynamicGet(obj, key);
 }
@@ -216,14 +218,14 @@ static NSString *keyFromPath(NSString *keyPath) {
     return sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
 }
 
-static RLMObservable *getObservable(RLMObjectSchema *objectSchema, realm::Row const& row) {
+static RLMObservable *getObservable(RLMObjectSchema *objectSchema, RLMRealm *realm, realm::Row const& row) {
     for (RLMObservable *o in objectSchema->_observers) {
         if (o->_row.get_index() == row.get_index()) {
             return o;
         }
     }
 
-    RLMObservable *observable = [[RLMObservable alloc] initWithRow:row schema:objectSchema];
+    RLMObservable *observable = [[RLMObservable alloc] initWithRow:row realm:realm schema:objectSchema];
     if (!objectSchema->_observers) {
         objectSchema->_observers = [NSMutableArray new];
     }
@@ -241,13 +243,13 @@ static RLMObservable *getObservable(RLMObjectSchema *objectSchema, realm::Row co
         return;
     }
 
-    RLMObservable *observable = getObservable(_objectSchema, _row);
+    RLMObservable *observable = getObservable(_objectSchema, _realm, _row);
     [observable addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
 - (void)removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath {
     if (_objectSchema[keyFromPath(keyPath)]) {
-        [getObservable(_objectSchema, _row) removeObserver:observer forKeyPath:keyPath];
+        [getObservable(_objectSchema, _realm, _row) removeObserver:observer forKeyPath:keyPath];
     }
     else {
         [super removeObserver:observer forKeyPath:keyPath];
@@ -256,7 +258,7 @@ static RLMObservable *getObservable(RLMObjectSchema *objectSchema, realm::Row co
 
 - (void)removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath context:(void *)context {
     if (_objectSchema[keyFromPath(keyPath)]) {
-        [getObservable(_objectSchema, _row) removeObserver:observer forKeyPath:keyPath context:context];
+        [getObservable(_objectSchema, _realm, _row) removeObserver:observer forKeyPath:keyPath context:context];
     }
     else {
         [super removeObserver:observer forKeyPath:keyPath context:context];
@@ -266,19 +268,19 @@ static RLMObservable *getObservable(RLMObjectSchema *objectSchema, realm::Row co
 @end
 
 void RLMWillChange(RLMObjectBase *obj, NSString *key) {
-    [getObservable(obj->_objectSchema, obj->_row) willChangeValueForKey:key];
+    [getObservable(obj->_objectSchema, obj->_realm, obj->_row) willChangeValueForKey:key];
 }
 
 void RLMDidChange(RLMObjectBase *obj, NSString *key) {
-    [getObservable(obj->_objectSchema, obj->_row) didChangeValueForKey:key];
+    [getObservable(obj->_objectSchema, obj->_realm, obj->_row) didChangeValueForKey:key];
 }
 
 void RLMWillChange(RLMObjectBase *obj, NSString *key, NSKeyValueChange kind, NSIndexSet *indices) {
-    [getObservable(obj->_objectSchema, obj->_row) willChange:kind valuesAtIndexes:indices forKey:key];
+    [getObservable(obj->_objectSchema, obj->_realm, obj->_row) willChange:kind valuesAtIndexes:indices forKey:key];
 }
 
 void RLMDidChange(RLMObjectBase *obj, NSString *key, NSKeyValueChange kind, NSIndexSet *indices) {
-    [getObservable(obj->_objectSchema, obj->_row) didChange:kind valuesAtIndexes:indices forKey:key];
+    [getObservable(obj->_objectSchema, obj->_realm, obj->_row) didChange:kind valuesAtIndexes:indices forKey:key];
 }
 
 @implementation RLMObservationInfo
