@@ -599,7 +599,8 @@ struct ObserverState {
     size_t table;
     size_t row;
     size_t column;
-    __unsafe_unretained RLMObservationInfo *info;
+    NSString *key;
+    __unsafe_unretained RLMObservable *observable;
 
     bool changed = false;
     std::vector<std::pair<NSKeyValueChange, NSMutableIndexSet *>> linkview_changes;
@@ -619,11 +620,11 @@ public:
             if (!o.changed)
                 continue;
             if (o.linkview_changes.size() != 1)
-                [o.info.obj willChangeValueForKey:o.info.key];
+                [o.observable willChangeValueForKey:o.key];
             else
-                [o.info.obj willChange:o.linkview_changes[0].first
+                [o.observable willChange:o.linkview_changes[0].first
                        valuesAtIndexes:o.linkview_changes[0].second
-                                forKey:o.info.key];
+                                forKey:o.key];
         }
     }
 
@@ -769,14 +770,15 @@ static void advance_notify(SharedGroup *sg, RLMSchema *schema) {
     std::vector<ObserverState> observers;
     // all this should maybe be precomputed or cached or something
     for (RLMObjectSchema *objectSchema in schema.objectSchema) {
-        for (NSString *key in objectSchema->_observers) {
-            for (RLMObservationInfo *observer in objectSchema->_observers[key]) {
-                auto row = observer.obj->_row;
+        for (RLMObservable *observable in objectSchema->_observers) {
+            auto const& row = observable->_row;
+            for (size_t i = 0; i < objectSchema.properties.count; ++i) {
                 observers.push_back({
                     row.get_table()->get_index_in_group(),
                     row.get_index(),
-                    observer.column,
-                    observer});
+                    i,
+                    [objectSchema.properties[i] name],
+                    observable});
             }
         }
     }
@@ -793,11 +795,11 @@ static void advance_notify(SharedGroup *sg, RLMSchema *schema) {
         if (!o.changed)
             continue;
         if (o.linkview_changes.size() != 1)
-            [o.info.obj didChangeValueForKey:o.info.key];
+            [o.observable didChangeValueForKey:o.key];
         else
-            [o.info.obj didChange:o.linkview_changes[0].first
+            [o.observable didChange:o.linkview_changes[0].first
                   valuesAtIndexes:o.linkview_changes[0].second
-                           forKey:o.info.key];
+                           forKey:o.key];
     }
 }
 

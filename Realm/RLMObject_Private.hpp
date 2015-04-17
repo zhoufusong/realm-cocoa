@@ -21,6 +21,13 @@
 #import <realm/link_view.hpp> // required by row.hpp
 #import <realm/row.hpp>
 
+@interface RLMObservable : NSObject {
+    @public
+    realm::Row _row;
+}
+@property (nonatomic) void *observationInfo;
+@end
+
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
     @public

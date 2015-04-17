@@ -23,7 +23,7 @@
 // RLMObjectSchema private
 @interface RLMObjectSchema () {
     @public
-    NSMutableDictionary *_observers;
+    NSMutableArray *_observers;
 }
 
 // writable redecleration

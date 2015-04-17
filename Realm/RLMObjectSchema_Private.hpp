@@ -28,10 +28,7 @@ namespace realm {
 }
 
 // RLMObjectSchema private
-@interface RLMObjectSchema () {
-    @public
-    std::vector<std::pair<realm::Row, void *>> _observationInfo;
-}
+@interface RLMObjectSchema ()
 
 @property (nonatomic) realm::Table *table;
 

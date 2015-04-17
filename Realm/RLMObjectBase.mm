@@ -28,6 +28,25 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+@implementation RLMObservable {
+    RLMObjectSchema *_objectSchema;
+}
+- (instancetype)initWithRow:(realm::Row const&)row schema:(RLMObjectSchema *)objectSchema {
+    self = [super init];
+    if (self) {
+        _row = row;
+        _objectSchema = objectSchema;
+    }
+    return self;
+}
+
+- (id)valueForKey:(NSString *)key {
+    RLMObject *obj = [[RLMObject alloc] initWithRealm:RLMRealm.defaultRealm schema:_objectSchema];
+    obj->_row = _row;
+    return RLMDynamicGet(obj, key);
+}
+@end
+
 const NSUInteger RLMDescriptionMaxDepth = 5;
 
 @implementation RLMObjectBase {
@@ -184,30 +203,6 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
     }
 }
 
-- (void *)observationInfo {
-    if (_objectSchema) {
-        for (auto const& info : _objectSchema->_observationInfo) {
-            if (info.first.get_index() == _row.get_index())
-                return info.second;
-        }
-    }
-    return [super observationInfo];
-}
-
-- (void)setObservationInfo:(void *)observationInfo {
-    if (_objectSchema) {
-        for (auto& info : _objectSchema->_observationInfo) {
-            if (info.first.get_index() == _row.get_index()) {
-                info.second = observationInfo;
-                return;
-            }
-        }
-        _objectSchema->_observationInfo.push_back({_row, observationInfo});
-        return;
-    }
-    [super setObservationInfo:observationInfo];
-}
-
 - (id)mutableArrayValueForKey:(NSString *)key {
     id obj = [self valueForKey:key];
     if ([obj isKindOfClass:[RLMArray class]]) {
@@ -216,99 +211,76 @@ const NSUInteger RLMDescriptionMaxDepth = 5;
     return [super mutableArrayValueForKey:key];
 }
 
+static NSString *keyFromPath(NSString *keyPath) {
+    NSUInteger sep = [keyPath rangeOfString:@"."].location;
+    return sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
+}
+
+static RLMObservable *getObservable(RLMObjectSchema *objectSchema, realm::Row const& row) {
+    for (RLMObservable *o in objectSchema->_observers) {
+        if (o->_row.get_index() == row.get_index()) {
+            return o;
+        }
+    }
+    return nil;
+}
+
 - (void)addObserver:(id)observer
          forKeyPath:(NSString *)keyPath
             options:(NSKeyValueObservingOptions)options
             context:(void *)context {
-    [super addObserver:observer forKeyPath:keyPath options:options context:context];
-    NSUInteger sep = [keyPath rangeOfString:@"."].location;
-    NSString *key = sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
-
+    NSString *key = keyFromPath(keyPath);
     if (!_objectSchema[key]) {
+        [super addObserver:observer forKeyPath:keyPath options:options context:context];
         return;
     }
 
-    if (!_objectSchema->_observers) {
-        _objectSchema->_observers = [NSMutableDictionary new];
+    RLMObservable *observable = getObservable(_objectSchema, _row);
+    if (!observable) {
+        observable = [[RLMObservable alloc] initWithRow:_row schema:_objectSchema];
+        if (!_objectSchema->_observers) {
+            _objectSchema->_observers = [NSMutableArray new];
+        }
+        [_objectSchema->_observers addObject:observable];
     }
 
-    NSMutableArray *observers = _objectSchema->_observers[key];
-    if (!observers) {
-        observers = [NSMutableArray new];
-        _objectSchema->_observers[key] = observers;
-    }
-
-    RLMObservationInfo *info = [RLMObservationInfo new];
-    info.observer = observer;
-    info.context = context;
-    info.obj = self;
-    info.key = key;
-    info.column = _objectSchema[key].column;
-    info.options = options;
-    [observers addObject:info];
+    [observable addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
 - (void)removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath {
-    [super removeObserver:observer forKeyPath:keyPath];
-
-    NSUInteger sep = [keyPath rangeOfString:@"."].location;
-    NSString *key = sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
-    NSMutableArray *observers = _objectSchema->_observers[key];
-    for (RLMObservationInfo *info in observers) {
-        if (info.observer == observer) {
-            [observers removeObject:info];
-            return;
-        }
+    if (_objectSchema[keyFromPath(keyPath)]) {
+        [getObservable(_objectSchema, _row) removeObserver:observer forKeyPath:keyPath];
+    }
+    else {
+        [super removeObserver:observer forKeyPath:keyPath];
     }
 }
 
 - (void)removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath context:(void *)context {
-    [super removeObserver:observer forKeyPath:keyPath context:context];
-
-    NSUInteger sep = [keyPath rangeOfString:@"."].location;
-    NSString *key = sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
-    NSMutableArray *observers = _objectSchema->_observers[key];
-    for (RLMObservationInfo *info in observers) {
-        if (info.observer == observer && info.context == context) {
-            [observers removeObject:info];
-            return;
-        }
+    if (_objectSchema[keyFromPath(keyPath)]) {
+        [getObservable(_objectSchema, _row) removeObserver:observer forKeyPath:keyPath context:context];
+    }
+    else {
+        [super removeObserver:observer forKeyPath:keyPath context:context];
     }
 }
 
 @end
 
-template<typename Func>
-static void forEachObserver(RLMObjectBase *obj, NSString *key, Func&& f) {
-    for (RLMObservationInfo *info in obj->_objectSchema->_observers[key]) {
-        if (info.obj->_row.get_index() == obj->_row.get_index()) {
-            f(info.obj);
-        }
-    }
-}
-
 void RLMWillChange(RLMObjectBase *obj, NSString *key) {
-    forEachObserver(obj, key, [=](RLMObjectBase *obj) {
-        [obj willChangeValueForKey:key];
-    });
+    [getObservable(obj->_objectSchema, obj->_row) willChangeValueForKey:key];
 }
 
 void RLMDidChange(RLMObjectBase *obj, NSString *key) {
-    forEachObserver(obj, key, [=](RLMObjectBase *obj) {
-        [obj didChangeValueForKey:key];
-    });
+    [getObservable(obj->_objectSchema, obj->_row) didChangeValueForKey:key];
 }
 
 void RLMWillChange(RLMObjectBase *obj, NSString *key, NSKeyValueChange kind, NSIndexSet *indices) {
-    forEachObserver(obj, key, [=](RLMObjectBase *obj) {
-        [obj willChange:kind valuesAtIndexes:indices forKey:key];
-    });
+    [getObservable(obj->_objectSchema, obj->_row) willChange:kind valuesAtIndexes:indices forKey:key];
 }
 
 void RLMDidChange(RLMObjectBase *obj, NSString *key, NSKeyValueChange kind, NSIndexSet *indices) {
-    forEachObserver(obj, key, [=](RLMObjectBase *obj) {
-        [obj didChange:kind valuesAtIndexes:indices forKey:key];
-    });
+    [getObservable(obj->_objectSchema, obj->_row) didChange:kind valuesAtIndexes:indices forKey:key];
 }
 
 @implementation RLMObservationInfo
