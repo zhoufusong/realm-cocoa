@@ -222,7 +222,13 @@ static RLMObservable *getObservable(RLMObjectSchema *objectSchema, realm::Row co
             return o;
         }
     }
-    return nil;
+
+    RLMObservable *observable = [[RLMObservable alloc] initWithRow:row schema:objectSchema];
+    if (!objectSchema->_observers) {
+        objectSchema->_observers = [NSMutableArray new];
+    }
+    [objectSchema->_observers addObject:observable];
+    return observable;
 }
 
 - (void)addObserver:(id)observer
@@ -236,14 +242,6 @@ static RLMObservable *getObservable(RLMObjectSchema *objectSchema, realm::Row co
     }
 
     RLMObservable *observable = getObservable(_objectSchema, _row);
-    if (!observable) {
-        observable = [[RLMObservable alloc] initWithRow:_row schema:_objectSchema];
-        if (!_objectSchema->_observers) {
-            _objectSchema->_observers = [NSMutableArray new];
-        }
-        [_objectSchema->_observers addObject:observable];
-    }
-
     [observable addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
