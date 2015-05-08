@@ -163,6 +163,12 @@ RLM_ARRAY_TYPE(DogObject)
 #pragma mark - Specific Use Objects
 #pragma mark -
 
+#pragma mark DefaultStringObject
+
+@interface DefaultStringObject : RLMObject
+@property NSString *stringCol;
+@end
+
 #pragma mark MixedObject
 
 @interface MixedObject : RLMObject

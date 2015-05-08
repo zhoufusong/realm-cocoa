@@ -94,6 +94,14 @@
 #pragma mark - Specific Use Objects
 #pragma mark -
 
+#pragma mark DefaultStringObject
+
+@implementation DefaultStringObject
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"stringCol" : @"default"};
+}
+@end
+
 #pragma mark MixedObject
 
 @implementation MixedObject
