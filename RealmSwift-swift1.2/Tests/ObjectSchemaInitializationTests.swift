@@ -144,10 +144,6 @@ class ObjectSchemaInitializationTests: TestCase {
             XCTAssertFalse(unindexibleSchema[propName]!.indexed, "Shouldn't mark unindexible property '\(propName)' as indexed")
         }
     }
-
-    func testNonNullableOptionalPropertiesAreCoerced() {
-        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonNullableOptionalProperties.self), "Should throw when marking non-String and non-Data properties as optional")
-    }
 }
 
 class SwiftFakeObject : NSObject {
@@ -203,8 +199,3 @@ class SwiftObjectWithUnindexibleProperties : SwiftFakeObject {
         return ["boolCol", "intCol", "floatCol", "doubleCol", "binaryCol", "dateCol", "objectCol", "arrayCol"]
     }
 }
-
-class SwiftObjectWithNonNullableOptionalProperties: SwiftFakeObject {
-    dynamic var optDateCol: NSDate?
-}
-
