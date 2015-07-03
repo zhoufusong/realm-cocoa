@@ -163,6 +163,13 @@ RLM_ARRAY_TYPE(DogObject)
 @property RLMArray<DogObject> *dogs;
 @end
 
+RLM_ARRAY_TYPE(DogArrayObject)
+
+#pragma mark DogArrayArrayObject
+
+@interface DogArrayArrayObject : RLMObject
+@property RLMArray<DogArrayObject> *array;
+@end
 
 #pragma mark OwnerObject
 

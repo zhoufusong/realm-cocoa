@@ -21,6 +21,9 @@
 @implementation DogArrayObject
 @end
 
+@implementation DogArrayArrayObject
+@end
+
 @interface ArrayPropertyTests : RLMTestCase
 @end
 

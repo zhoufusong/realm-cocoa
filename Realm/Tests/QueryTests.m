@@ -1208,7 +1208,7 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     ArrayPropertyObject *arrPropObj1 = [[ArrayPropertyObject alloc] init];
-    arrPropObj1.name = @"Test";
+    arrPropObj1.name = @"Test1";
     for(NSUInteger i=0; i<10; i++) {
         StringObject *sobj = [[StringObject alloc] init];
         sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
@@ -1226,7 +1226,7 @@
     XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY array.stringCol = '1'"] count], 1U);
 
     ArrayPropertyObject *arrPropObj2 = [[ArrayPropertyObject alloc] init];
-    arrPropObj2.name = @"Test";
+    arrPropObj2.name = @"Test2";
     for(NSUInteger i=0; i<4; i++) {
         StringObject *sobj = [[StringObject alloc] init];
         sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
@@ -1241,6 +1241,51 @@
     XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 10"] count], 0U);
     XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 5"] count], 1U);
     XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 2"] count], 2U);
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol >= 6 AND ANY intArray.intCol <= 8"] count], 1U);
+    ArrayPropertyObject *a =[[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol >= 6 AND ANY intArray.intCol <= 8"] firstObject];
+    XCTAssertTrue([a.name isEqualToString:@"Test1"]);
+
+    ArrayPropertyObject *arrPropObj3 = [[ArrayPropertyObject alloc] init];
+    arrPropObj3.name = @"Test3";
+    for(NSUInteger i=0; i<4; i++) {
+        StringObject *sobj = [[StringObject alloc] init];
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
+        [arrPropObj3.array addObject:sobj];
+        IntObject *iobj = [[IntObject alloc] init];
+        iobj.intCol = (int)(20+i);
+        [arrPropObj3.intArray addObject:iobj];
+    }
+    [realm beginWriteTransaction];
+    [realm addObject:arrPropObj3];
+    [realm commitWriteTransaction];
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol >= 22 AND ANY intArray.intCol <= 23"] count], 1U);
+}
+
+- (void)testThreeLevelLinkQuery
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    DogArrayArrayObject *aa = [[DogArrayArrayObject alloc] init];
+    
+    DogArrayObject *da1 = [[DogArrayObject alloc] init];
+    DogObject *dog1 = [[DogObject alloc] init];
+    dog1.age = 5;
+    dog1.dogName = @"Dog1";
+    [da1.dogs addObject:dog1];
+    [aa.array addObject:da1];
+
+    DogArrayObject *da2 = [[DogArrayObject alloc] init];
+    DogObject *dog2 = [[DogObject alloc] init];
+    dog2.age = 8;
+    dog2.dogName = @"Dog2";
+    [da2.dogs addObject:dog2];
+    [aa.array addObject:da2];
+
+    [realm beginWriteTransaction];
+    [realm addObject:aa];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual([[realm objects:[DogArrayArrayObject className] where:@"ANY array.dogs.age >= 6 AND ANY array.dogs.age <= 7"] count], 0U);
 }
 
 - (void)testMultiLevelLinkQuery
