@@ -34,10 +34,7 @@
  Obtains an `RLMRealm` instance with persistence to a specific file path with
  options.
  
- @see RLMRealm defaultRealm
- @see RLMRealm realmWithPath:
- @see RLMRealm realmWithPath:readOnly:error:
- @see RLMRealm realmWithPath:encryptionKey:readOnly:error:
+ @warning This method is useful only in specialized circumstances.
 
  @param path         Path to the file you want the data saved in.
  @param key          64-byte key to use to encrypt the data.
@@ -50,6 +47,11 @@
                      possible errors, pass in NULL.
 
  @return An `RLMRealm` instance.
+ 
+ @see RLMRealm defaultRealm
+ @see RLMRealm realmWithPath:
+ @see RLMRealm realmWithPath:readOnly:error:
+ @see RLMRealm realmWithPath:encryptionKey:readOnly:error:
  */
 + (instancetype)realmWithPath:(NSString *)path
                           key:(NSData *)key
@@ -71,6 +73,8 @@
  Get all objects of a given type in this Realm.
  
  The preferred way to get objects of a single class is to use the class methods on RLMObject.
+ 
+ @warning This method is useful only in specialized circumstances.
 
  @param className   The name of the RLMObject subclass to retrieve on e.g. `MyClass.className`.
 
@@ -88,6 +92,8 @@
  Get objects matching the given predicate from the this Realm.
 
  The preferred way to get objects of a single class is to use the class methods on RLMObject.
+ 
+ @warning This method is useful only in specialized circumstances.
 
  @param className       The type of objects you are looking for (name of the class).
  @param predicateFormat The predicate format string which can accept variable arguments.
@@ -106,6 +112,8 @@
  Get objects matching the given predicate from the this Realm.
 
  The preferred way to get objects of a single class is to use the class methods on RLMObject.
+ 
+ @warning This method is useful only in specialized circumstances.
 
  @param className   The type of objects you are looking for (name of the class).
  @param predicate   The predicate to filter the objects.
@@ -122,6 +130,8 @@
  recommended to use [RLMObject createInDefaultRealmWithValue:].
  
  Create an RLMObject of type `className` in the Realm with a given object.
+ 
+ @warning This method is useful only in specialized circumstances.
 
  @param value   The value used to populate the object. This can be any key/value coding compliant
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
@@ -144,6 +154,8 @@
  to use this method as an [RLMObjectSchema](RLMObjectSchema) is generated automatically for every [RLMObject](RLMObject) subclass.
  
  Initialize an RLMObjectSchema with classname, objectClass, and an array of properties
+ 
+ @warning This method is useful only in specialized circumstances.
 
  @param objectClassName     The name of the class used to refer to objects of this type.
  @param objectClass         The objective-c class used when creating instances of this type.
@@ -161,6 +173,8 @@
  app on Realm, it is not recommened to use this method.
  
  Initialize an RLMProperty
+ 
+ @warning This method is useful only in specialized circumstances.
 
  @param name            The property name.
  @param type            The property type.
