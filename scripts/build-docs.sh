@@ -21,12 +21,8 @@ appledoc \
     --no-warn-invalid-crossref \
     --no-warn-undocumented-object \
     --no-warn-undocumented-member \
-    --ignore "Realm/RLMRealm_Dynamic.h" \
-    --ignore "Realm/RLMArrayAccessor.h" \
-    --ignore "Realm/RLMArrayAccessor.mm" \
-    --ignore "Realm/RLMQueryUtil.h" \
-    --ignore "Realm/RLMUtil.h" \
-    --ignore "Realm/RLMRealm_Dynamic.h" \
+    --ignore ".m" \
+    --ignore ".mm" \
     --ignore "Realm/Realm-Bridging-Header.h" \
     --ignore "Realm/Tests" \
     --template "${SRCROOT}/docs/templates/objc" \
