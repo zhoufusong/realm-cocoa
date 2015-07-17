@@ -23,6 +23,7 @@ appledoc \
     --no-warn-undocumented-member \
     --ignore ".m" \
     --ignore ".mm" \
+    --ignore "Realm/RLMObjectStore.h" \
     --ignore "Realm/Realm-Bridging-Header.h" \
     --ignore "Realm/Tests" \
     --template "${SRCROOT}/docs/templates/objc" \
