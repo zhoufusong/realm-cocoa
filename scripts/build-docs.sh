@@ -23,8 +23,20 @@ appledoc \
     --no-warn-undocumented-member \
     --ignore ".m" \
     --ignore ".mm" \
+    --ignore ".hpp" \
     --ignore "Realm/RLMObjectStore.h" \
-    --ignore "Realm/RLMCollection.h" \
+    --ignore "Realm/RLMListBase.h" \
+    --ignore "Realm/RLMSchema_Private.h" \
+    --ignore "Realm/RLMRealm_Private.h" \
+    --ignore "Realm/RLMRealmUtil.h" \
+    --ignore "Realm/RLMObject_Private.h" \
+    --ignore "Realm/RLMProperty_Private.h" \
+    --ignore "Realm/RLMResults_Private.h" \
+    --ignore "Realm/RLMArray_Private.h" \
+    --ignore "Realm/RLMObjectSchema_Private.h" \
+    --ignore "Realm/RLMMigration_Private.h" \
+    --ignore "Realm/RLMAccessor.h" \
+    --ignore "Realm/RLMSwiftSupport.h" \
     --ignore "Realm/Realm-Bridging-Header.h" \
     --ignore "Realm/Tests" \
     --template "${SRCROOT}/docs/templates/objc" \
