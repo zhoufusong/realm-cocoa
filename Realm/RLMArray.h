@@ -215,7 +215,7 @@ RLM_ASSUME_NONNULL_BEGIN
  
  @param predicateFormat The predicate format string which can accept variable arguments.
  
- @return    An RLMResults of objects that match the given predicate
+ @return                An RLMResults of objects that match the given predicate
  */
 - (RLMResults RLM_GENERIC_RETURN*)objectsWhere:(NSString *)predicateFormat, ...;
 
