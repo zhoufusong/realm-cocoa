@@ -18,19 +18,34 @@
 
 #import "RLMListBase.h"
 #import <Realm/RLMArray.h>
+#import <Realm/RLMCollection.h>
+
+@interface RLMListBase ()<RLMCollection>
+
+@end
 
 @implementation RLMListBase
 
+@dynamic count, objectClassName, realm;
+
 - (instancetype)initWithArray:(RLMArray *)array {
-    self = [super init];
     if (self) {
         __rlmArray = array;
     }
     return self;
 }
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained [])buffer count:(NSUInteger)len {
-    return [__rlmArray countByEnumeratingWithState:state objects:buffer count:len];
+- (void)forwardInvocation:(nonnull NSInvocation *)invocation {
+    [invocation invokeWithTarget:__rlmArray];
+}
+
+- (nullable NSMethodSignature *)methodSignatureForSelector:(nonnull SEL)sel {
+    return [__rlmArray methodSignatureForSelector:sel];
+}
+
+- (id)forwardingTargetForSelector:(__unused SEL)aSelector
+{
+    return __rlmArray;
 }
 
 @end

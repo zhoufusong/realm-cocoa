@@ -69,7 +69,7 @@ public final class List<T: Object>: ListBase {
     // MARK: Initializers
 
     /// Creates a `List` that holds objects of type `T`.
-    public override init() {
+    public init() {
         super.init(array: RLMArray(objectClassName: T.className()))
     }
 
@@ -149,7 +149,7 @@ public final class List<T: Object>: ListBase {
 
     :returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
     */
-    public override func valueForKey(key: String) -> AnyObject? {
+    public func valueForKey(key: String) -> AnyObject? {
         return _rlmArray.valueForKey(key)
     }
 
@@ -161,7 +161,7 @@ public final class List<T: Object>: ListBase {
     :param: value The object value.
     :param: key   The name of the property.
     */
-    public override func setValue(value: AnyObject?, forKey key: String) {
+    public func setValue(value: AnyObject?, forKey key: String) {
         return _rlmArray.setValue(value, forKey: key)
     }
 
