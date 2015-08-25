@@ -37,6 +37,7 @@
 
 #include "object_store.hpp"
 #include "shared_realm.hpp"
+
 #include <realm/commit_log.hpp>
 #include <realm/disable_sync_to_disk.hpp>
 #include <realm/version.hpp>
@@ -44,6 +45,10 @@
 using namespace std;
 using namespace realm;
 using namespace realm::util;
+
+@interface RLMRealmConfiguration ()
+- (realm::Realm::Config&)config;
+@end
 
 @interface RLMSchema ()
 + (instancetype)dynamicSchemaFromObjectStoreSchema:(realm::Schema &)objectStoreSchema;
@@ -72,10 +77,6 @@ void RLMDisableSyncToDisk() {
     _notification.reset();
 }
 @end
-
-using namespace std;
-using namespace realm;
-using namespace realm::util;
 
 //
 // Global encryption key cache and validation
@@ -291,8 +292,12 @@ void RLMRealmAddPathSettingsToConfiguration(RLMRealmConfiguration *configuration
                         error:(NSError **)outError
 {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-    configuration.path = path;
-    configuration.inMemoryIdentifier = inMemory ? path.lastPathComponent : nil;
+    if (inMemory) {
+        configuration.inMemoryIdentifier = path.lastPathComponent;
+    }
+    else {
+        configuration.path = path;
+    }
     configuration.encryptionKey = key;
     configuration.readOnly = readonly;
     configuration.dynamic = dynamic;
@@ -404,33 +409,22 @@ static Schema RLMObjectStoreSchemaForRLMSchema(RLMSchema *rlmSchema) {
 }
 
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
+    configuration = [configuration copy];
+    Realm::Config& config = configuration.config;
+
     NSString *path = configuration.path;
-    bool inMemory = false;
-    if (configuration.inMemoryIdentifier) {
-        inMemory = true;
-        path = [RLMRealm writeableTemporaryPathForFile:configuration.inMemoryIdentifier];
-    }
     RLMSchema *customSchema = configuration.customSchema;
     bool dynamic = configuration.dynamic;
     bool readOnly = configuration.readOnly;
 
-    if (!path || path.length == 0) {
-        @throw RLMException([NSString stringWithFormat:@"Path '%@' is not valid", path]);
-    }
-
-    if (![NSRunLoop currentRunLoop]) {
-        @throw RLMException([NSString stringWithFormat:@"%@ \
-                             can only be called from a thread with a runloop.",
-                             NSStringFromSelector(_cmd)]);
-    }
-
     // try to reuse existing realm first
     RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(path);
     if (realm) {
-        if (realm.isReadOnly != readOnly) {
+        auto const& old_config = realm->_realm->config();
+        if (old_config.read_only != config.read_only) {
             @throw RLMException(@"Realm at path already opened with different read permissions", @{@"path":realm.path});
         }
-        if (realm->_realm->config().in_memory != inMemory) {
+        if (old_config.in_memory != config.in_memory) {
             @throw RLMException(@"Realm at path already opened with different inMemory settings", @{@"path":realm.path});
         }
         if (realm->_dynamic != dynamic) {
@@ -439,20 +433,12 @@ static Schema RLMObjectStoreSchemaForRLMSchema(RLMSchema *rlmSchema) {
         return RLMAutorelease(realm);
     }
 
-    NSData *key = configuration.encryptionKey ?: keyForPath(path);
-    key = RLMRealmValidatedEncryptionKey(key);
+    if (!configuration.encryptionKey) {
+        configuration.encryptionKey = keyForPath(path);
+    }
 
     realm = [RLMRealm new];
     realm->_dynamic = dynamic;
-
-    realm::Realm::Config config;
-    config.path = path.UTF8String;
-    config.read_only = readOnly;
-    config.in_memory = inMemory;
-    if (key) {
-        config.encryption_key = std::make_unique<char[]>(key.length);
-        memcpy(config.encryption_key.get(), key.bytes, key.length);
-    }
 
     config.migration_function = [=](SharedRealm old_realm, SharedRealm realm) {
         RLMMigrationBlock userBlock = configuration.migrationBlock ?: migrationBlockForPath(path);
@@ -480,7 +466,7 @@ static Schema RLMObjectStoreSchemaForRLMSchema(RLMSchema *rlmSchema) {
         }
         else {
             // set/align schema or perform migration if needed
-            uint64_t newVersion = configuration.schemaVersion;
+            uint64_t newVersion = config.schema_version;
             try {
                 RLMSchema *targetSchema = customSchema ?: [RLMSchema.sharedSchema copy];
                 Schema schema = RLMObjectStoreSchemaForRLMSchema(targetSchema);
@@ -578,20 +564,11 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (RLMRealmConfiguration *)configuration {
-#if 0
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-    configuration.path = self.path;
-    configuration.schemaVersion = [RLMRealm schemaVersionAtPath:_path encryptionKey:_encryptionKey error:nil];
-    if (_inMemory) {
-        configuration.inMemoryIdentifier = [_path lastPathComponent];
-    }
-    configuration.readOnly = _readOnly;
-    configuration.encryptionKey = _encryptionKey;
+    configuration.config = _realm->config();
     configuration.dynamic = _dynamic;
     configuration.customSchema = _schema;
     return configuration;
-#endif
-    return nil;
 }
 
 - (void)beginWriteTransaction {
