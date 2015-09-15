@@ -1734,6 +1734,28 @@
                                       @"Operator 'ENDSWITH' is not supported .* right side");
 }
 
+- (void)testDefaultAccessAcrossMultipleThreads
+{
+    const int iterations = 10000000;
+    const int numberOfConcurrentQueues = 10;
+    
+    void (^executionBlock)() = ^{
+        RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+        NSLog(@"Accessed default Realm (%@) on thread: %@", defaultRealm, [NSThread currentThread]);
+    };
+    
+    NSOperationQueue *operationQueue = [[NSOperationQueue alloc] init];
+    operationQueue.maxConcurrentOperationCount = numberOfConcurrentQueues;
+    
+    for (NSInteger i = 0; i < iterations; i++) {
+        NSBlockOperation *operation = [[NSBlockOperation alloc] init];
+        [operation addExecutionBlock:executionBlock];
+        [operationQueue addOperation:operation];
+    };
+    
+    [operationQueue waitUntilAllOperationsAreFinished];
+}
+
 #ifdef REALM_ENABLE_NULL
 - (void)testQueryOnNullableStringColumn {
     void (^testWithStringClass)(Class) = ^(Class stringObjectClass) {
@@ -1825,6 +1847,7 @@
     testWithStringClass([LinkStringObject class], [StringObject class]);
     testWithStringClass([LinkIndexedStringObject class], [IndexedStringObject class]);
 }
+
 #endif
 
 @end
