@@ -12,7 +12,7 @@ When filing an issue, please provide as much of the following information as pos
 4. **Steps to reproduce**
 5. **Code sample that highlights the issue** (full Xcode projects that we can compile ourselves are ideal)
 6. **Version of Realm / Xcode / OSX**
-7. **Version of involved dependency manager (CocoaPods / Carthage)**
+7. **Version of involved dependency manager (CocoaPods / Carthage)**, if applicable - otherwise please describe how you integrate Realm (from prebuilt binaries, from source, or by dragging `Realm.xcodeproj` into your app's project)
 
 If you'd like to send us sensitive sample code to help troubleshoot your issue, you can email <help@realm.io> directly.
 
@@ -27,13 +27,17 @@ $(sw_vers)
 $(xcode-select -p)
 $(xcodebuild -version)
 
+$(unset RLM_USING_DEPENDENCY_MANAGER)
+
 $(which pod && pod --version)
-$(test -e Podfile.lock && cat Podfile.lock | sed -nE 's/^  - (Realm(Swift)? [^:]*):?/\1/p' || echo "(not in use here)")
+$(test -e Podfile.lock && cat Podfile.lock | sed -nE 's/^  - (Realm(Swift)? [^:]*):?/\1/p' && export RLM_USING_DEPENDENCY_MANAGER=1 || echo "(not in use here)")
 
 $(which bash && bash -version | head -n1)
 
 $(which carthage && carthage version)
-$(test -e Cartfile.resolved && cat Cartfile.resolved | grep --color=no realm || echo "(not in use here)")
+$(test -e Cartfile.resolved && cat Cartfile.resolved | grep --color=no realm && export RLM_USING_DEPENDENCY_MANAGER=1 || echo "(not in use here)")
+
+$(test $RLM_USING_DEPENDENCY_MANAGER || echo "⚠ Please describe how you integrate Realm:\n[ ] prebuilt binaries\n[ ] compiled myself from source\n[ ] dragged Realm.xcodeproj into my app's project")
 
 $(which git && git --version)
 \`\`\`" | tee /dev/tty | pbcopy
