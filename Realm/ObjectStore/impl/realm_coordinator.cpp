@@ -405,7 +405,7 @@ void RealmCoordinator::advance_to_ready(Realm& realm)
             }
         }
 
-        // no untargeted async queries; just advance to latest
+        // no async queries; just advance to latest
         if (version.version == 0) {
             transaction::advance(sg, history, realm.m_binding_context.get());
             return;
