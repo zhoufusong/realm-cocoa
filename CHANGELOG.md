@@ -1,3 +1,11 @@
+0.96.4 Release notes (2015-12-07)
+=============================================================
+
+### Bugfixes
+
+* Remove the check for if a debugger is attached when opening an encrypted
+  Realm.
+
 0.96.3 Release notes (2015-12-04)
 =============================================================
 

@@ -35,21 +35,6 @@
     return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 
-+ (XCTestSuite *)defaultTestSuite
-{
-    if (RLMIsDebuggerAttached()) {
-        XCTestSuite *suite = [XCTestSuite testSuiteWithName:NSStringFromClass(self)];
-        [suite addTest:[EncryptionTests testCaseWithSelector:@selector(encryptionTestsAreSkippedWhileDebuggerIsAttached)]];
-        return suite;
-    }
-
-    return [super defaultTestSuite];
-}
-
-- (void)encryptionTestsAreSkippedWhileDebuggerIsAttached
-{
-}
-
 #pragma mark - Key validation
 
 - (void)testBadEncryptionKeys {
