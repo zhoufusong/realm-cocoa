@@ -94,6 +94,7 @@ ExternalCommitHelper::ExternalCommitHelper(RealmCoordinator& parent)
         throw std::system_error(errno, std::system_category());
     }
 
+#if !TARGET_OS_TV
     auto path = parent.get_path() + ".note";
 
     // Create and open the named pipe
@@ -129,31 +130,31 @@ ExternalCommitHelper::ExternalCommitHelper(RealmCoordinator& parent)
         throw std::system_error(errno, std::system_category());
     }
 
-    // Create the anonymous pipe
-    int pipeFd[2];
-    ret = pipe(pipeFd);
+#else // !TARGET_OS_TV
+
+    // tvOS does not support named pipes, so use an anonymous pipe instead
+    int notification_pipe[2];
+    int ret = pipe(notification_pipe);
     if (ret == -1) {
         throw std::system_error(errno, std::system_category());
     }
 
-    m_shutdown_read_fd = pipeFd[0];
-    m_shutdown_write_fd = pipeFd[1];
+    m_notify_fd = notification_pipe[0];
+    m_notify_fd_write = notification_pipe[1];
 
-    m_thread = std::async(std::launch::async, [=] {
-        try {
-            listen();
-        }
-        catch (std::exception const& e) {
-            fprintf(stderr, "uncaught exception in notifier thread: %s: %s\n", typeid(e).name(), e.what());
-            asl_log(nullptr, nullptr, ASL_LEVEL_ERR, "uncaught exception in notifier thread: %s: %s", typeid(e).name(), e.what());
-            throw;
-        }
-        catch (...) {
-            fprintf(stderr,  "uncaught exception in notifier thread\n");
-            asl_log(nullptr, nullptr, ASL_LEVEL_ERR, "uncaught exception in notifier thread");
-            throw;
-        }
-    });
+#endif // TARGET_OS_TV
+
+    // Create the anonymous pipe for shutdown notifications
+    int shutdown_pipe[2];
+    ret = pipe(shutdown_pipe);
+    if (ret == -1) {
+        throw std::system_error(errno, std::system_category());
+    }
+
+    m_shutdown_read_fd = shutdown_pipe[0];
+    m_shutdown_write_fd = shutdown_pipe[1];
+
+    m_thread = std::async(std::launch::async, [=] { listen(); });
 }
 
 ExternalCommitHelper::~ExternalCommitHelper()
@@ -202,5 +203,10 @@ void ExternalCommitHelper::listen()
 
 void ExternalCommitHelper::notify_others()
 {
-    notify_fd(m_notify_fd);
+    if (m_notify_fd_write != -1) {
+        notify_fd(m_notify_fd_write);
+    }
+    else {
+        notify_fd(m_notify_fd);
+    }
 }
