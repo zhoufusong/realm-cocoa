@@ -5,6 +5,9 @@
 
 * Remove the check for if a debugger is attached when opening an encrypted
   Realm.
+* Fix crashes when calling `-[RLMRealm deleteObjects:]` on an `RLMResults`
+  which filtered the objects when there are other classes linking to the type
+  of the deleted objects.
 
 0.96.3 Release notes (2015-12-04)
 =============================================================

@@ -500,7 +500,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 
     RLMTrackDeletions(_realm, ^{
         // call clear to remove all from the realm
-        _backingView.clear();
+        _backingView.clear(RemoveMode::unordered);
     });
 }
 

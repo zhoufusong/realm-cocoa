@@ -555,7 +555,7 @@ public:
         return true;
     }
 
-    bool erase_rows(size_t row_ndx, size_t, size_t last_row_ndx, bool unordered) noexcept {
+    bool erase_rows(size_t row_ndx, size_t, size_t last_row_ndx, bool) noexcept {
         for (size_t i = 0; i < observers.size(); ++i) {
             auto& o = observers[i];
             if (o.table == currentTable) {
@@ -563,11 +563,8 @@ public:
                     invalidate(&o);
                     --i;
                 }
-                else if (unordered && o.row == last_row_ndx) {
+                else if (o.row == last_row_ndx) {
                     o.row = row_ndx;
-                }
-                else if (!unordered && o.row > row_ndx) {
-                    o.row -= 1;
                 }
             }
         }
