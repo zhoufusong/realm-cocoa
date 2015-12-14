@@ -91,6 +91,7 @@ public:
     RLMNotificationHelper(RLMRealm *realm) : _realm(realm) { }
 
     bool can_deliver_notifications() const noexcept override {
+        return true;
         if (auto mode = CFRunLoopCopyCurrentMode(CFRunLoopGetCurrent())) {
             CFRelease(mode);
             return true;
