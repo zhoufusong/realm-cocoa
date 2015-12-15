@@ -27,88 +27,75 @@ static void createObject(int value) {
     }
 }
 
+static NSMutableArray *queue() {
+    static NSMutableArray *a;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        a = [NSMutableArray new];
+    });
+    return a;
+}
+
+static void pushToken(id token) {
+    NSMutableArray *q = queue();
+    @synchronized(q) {
+        if (q.count == 0)
+            [q addObject:token];
+        else
+            [q insertObject:token atIndex:arc4random_uniform((uint32_t)q.count)];
+    }
+}
+
+static bool popToken() {
+    NSMutableArray *q = queue();
+    @synchronized(q) {
+        if (q.count) {
+            [q removeLastObject];
+            return true;
+        }
+    }
+    return false;
+}
+
 static void doStuff() {
     __block int calls = 0;
-    __block NSMutableSet *waiting = [NSMutableSet new];
-    void (^block)(RLMResults *, NSError *) = ^(RLMResults *results, __unused NSError *error) {
-//        NSLog(@"%d: call waiting[%p]", (int)pthread_mach_thread_np(pthread_self()), (__bridge void *)waiting);
+    __block void (^block)(RLMResults *, NSError *);
+    NSMutableArray *queries = [NSMutableArray new];
+    block = ^(__unused RLMResults *results, __unused NSError *error) {
         ++calls;
-        [waiting removeObject:results];
-        if (waiting.count == 0) {
-//            NSLog(@"%d: stopping[%p]", (int)pthread_mach_thread_np(pthread_self()), (void *)CFRunLoopGetCurrent());
+        if (calls < 100) {
+            for (int i = 0; i < 3; ++i) {
+                uint32_t idx = arc4random_uniform(10);
+                if (idx >= queries.count) {
+                    [queries addObject:[IntObject allObjects]];
+                    pushToken([queries.lastObject addNotificationBlock:block]);
+                }
+                else {
+                    pushToken([queries[idx] addNotificationBlock:block]);
+                }
+            }
+        }
+        else {
+            block = nil;
+        }
+
+        createObject(calls);
+
+        if (!popToken()) {
             CFRunLoopStop(CFRunLoopGetCurrent());
         }
     };
 
-    RLMResults *results[5];
-    id tokens[10];
-
-    // Create five queries with notifications and wait for initial results
-    for (int i = 0; i < 5; ++i) {
-        results[i] = [IntObject allObjects];
-        tokens[i] = [results[i] addNotificationBlock:block];
-        [waiting addObject:results[i]];
-    }
-//    NSLog(@"%d: waiting[%p]", (int)pthread_mach_thread_np(pthread_self()), (__bridge void *)waiting);
-//    NSLog(@"%d: running[%p]", (int)pthread_mach_thread_np(pthread_self()), (void *)CFRunLoopGetCurrent());
-//    while (calls < 5)
-        CFRunLoopRun();
-//    NSLog(@"%d: assertion", (int)pthread_mach_thread_np(pthread_self()));
-    if (calls < 5)
-        return;
-    assert(calls >= 5);
-//    NSLog(@"%d: queries created", (int)pthread_mach_thread_np(pthread_self()));
-
-    // Add another block to each query, wait for them
-    for (int i = 5; i < 10; ++i) {
-        tokens[i] = [results[i - 5] addNotificationBlock:block];
-        [waiting addObject:results[i - 5]];
-    }
-    CFRunLoopRun();
-    assert(calls >= 10);
-//    NSLog(@"%d: blocks added", (int)pthread_mach_thread_np(pthread_self()));
-
-    // We're done adding queries so we no longer need to track which ones
-    // exactly have been notified, as they're all notified in one runloop
-    // task
-    waiting = nil;
-
-    for (int i = 0; i < 10; ++i) {
-        createObject(i);
-
-        // Remove a random token
-        int idx = arc4random_uniform(10 - i) + i;
-        [tokens[idx] stop];
-        tokens[idx] = tokens[i];
-
-        // Wait for all remaining ones to get a notification
-        if (i < 9) {
-            CFRunLoopRun();
-        }
-//        NSLog(@"%d: removed %d/10", (int)pthread_mach_thread_np(pthread_self()), i + 1);
-    }
+    [queries addObject:[IntObject allObjects]];
+    pushToken([queries.lastObject addNotificationBlock:block]);
 }
 
 static void *wrapper(void *ctx) {
-    CFRunLoopObserverRef observer = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopAllActivities, YES, 0,
-                                                                       ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
-                                                                           NSString *str;
-#define ACTIVITY(s) case kCFRunLoop##s: str = @#s; break
-                                                                           switch (activity) {
-                                                                               ACTIVITY(Entry);
-                                                                               ACTIVITY(BeforeTimers);
-                                                                               ACTIVITY(BeforeSources);
-                                                                               ACTIVITY(BeforeWaiting);
-                                                                               ACTIVITY(AfterWaiting);
-                                                                               ACTIVITY(Exit);
-                                                                               default: str = @((int)activity).stringValue;
-                                                                           }
-                                                                           NSLog(@"%d: observer[%@]", (int)pthread_mach_thread_np(pthread_self()), str);
-                                                                       });
-//    CFRunLoopAddObserver(CFRunLoopGetCurrent(), observer, kCFRunLoopCommonModes);
-
     @autoreleasepool {
-        doStuff();
+        CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+            doStuff();
+        });
+        CFRunLoopRun();
     }
     return ctx;
 }
