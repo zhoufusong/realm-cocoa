@@ -109,6 +109,7 @@ int main(int argc, char *argv[]) {
         }
 
         for (int i = 0; i < count * 3; ++i) {
+            NSLog(@"%d", i);
             if (i >= count)
                 pthread_join(threads[i - count], 0);
             if (i < count * 2)
