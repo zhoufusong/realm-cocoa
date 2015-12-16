@@ -34,6 +34,7 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) {
 
 @implementation UtilTests
 
+#if 0
 - (void)testRLMExceptionWithReasonAndUserInfo {
     NSString *const reason = @"Reason";
     NSDictionary *expectedUserInfo = @{
@@ -55,6 +56,7 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) {
     XCTAssertTrue(RLMEqualExceptions(RLMException(exception),
                                      [NSException exceptionWithName:RLMExceptionName reason:@"Reason" userInfo:expectedUserInfo]));
 }
+#endif
 
 - (void)testRLMMakeError {
     std::runtime_error exception("Reason");

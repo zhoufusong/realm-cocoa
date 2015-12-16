@@ -841,7 +841,7 @@
     [realm commitWriteTransaction];
 
     id expectation = [self expectationWithDescription:@""];
-    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+    RLMNotificationToken *token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
         XCTAssertNotNil(array);
         XCTAssertNil(error);
         [expectation fulfill];
@@ -858,7 +858,7 @@
     [realm commitWriteTransaction];
 
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+    RLMNotificationToken *token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
         XCTAssertNotNil(array);
         XCTAssertNil(error);
         [expectation fulfill];
@@ -884,7 +884,7 @@
     [realm commitWriteTransaction];
 
     id expectation = [self expectationWithDescription:@""];
-    id token = [array.array addNotificationBlock:^(__unused RLMArray *array, __unused NSError *error) {
+    RLMNotificationToken *token = [array.array addNotificationBlock:^(__unused RLMArray *array, __unused NSError *error) {
         // will throw if it's incorrectly called a second time due to the
         // unrelated write transaction
         [expectation fulfill];
@@ -908,7 +908,7 @@
     [realm commitWriteTransaction];
 
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
+    RLMNotificationToken *token = [array.array addNotificationBlock:^(RLMArray *array, NSError *error) {
         XCTAssertNotNil(array);
         XCTAssertNil(error);
         // will throw if it's called a second time before we create the new

@@ -7,6 +7,7 @@
 //
 
 #import <TargetConditionals.h>
+#import <XCTest/XCTest.h>
 
 #if TARGET_OS_TV || TARGET_OS_WATCH
 
@@ -35,9 +36,19 @@ int main(int argc, char *argv[]) {
 
 #import <Cocoa/Cocoa.h>
 
+#import "RLMTestCase.h"
+
+@interface DynamicTests : RLMTestCase
+@end
+
+
 int main(int argc, const char *argv[]) {
     @autoreleasepool {
-        return NSApplicationMain(argc, argv);
+        XCTestSuite *suite = [XCTestSuite defaultTestSuite];
+//        XCTestSuite *suite = [XCTestSuite testSuiteForTestCaseClass:[DynamicTests class]];
+        [suite run];
+        return 0;
+//        return NSApplicationMain(argc, argv);
     }
 }
 

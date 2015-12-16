@@ -313,11 +313,9 @@ void RealmCoordinator::run_async_queries()
 
     // Reacquire the lock while updating the fields that are actually read on
     // other threads
-    {
-        lock.lock();
-        for (auto& query : queries_to_run) {
-            query->prepare_handover();
-        }
+    lock.lock();
+    for (auto& query : queries_to_run) {
+        query->prepare_handover();
     }
 
     clean_up_dead_queries();
