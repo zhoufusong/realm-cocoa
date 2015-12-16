@@ -90,6 +90,17 @@ class RLMNotificationHelper : public realm::BindingContext {
 public:
     RLMNotificationHelper(RLMRealm *realm) : _realm(realm) { }
 
+    bool can_deliver_notifications() const noexcept override {
+        if (auto mode = CFRunLoopCopyCurrentMode(CFRunLoopGetCurrent())) {
+            CFRelease(mode);
+            return true;
+        }
+
+        // The main thread might not be in a run loop *yet*, but it presumably
+        // will be later
+        return [NSThread isMainThread];
+    }
+
     void changes_available() override {
         if (!_realm.autorefresh) {
             [_realm sendNotifications:RLMRealmRefreshRequiredNotification];
