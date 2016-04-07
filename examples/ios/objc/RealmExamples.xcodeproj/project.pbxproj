@@ -16,6 +16,11 @@
 		227D20C71CB58756008F641B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 227D20C61CB58756008F641B /* AppDelegate.m */; };
 		227D20D81CB5878E008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20D71CB5878E008F641B /* LaunchScreen.storyboard */; };
 		227D20DB1CB587F1008F641B /* TableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 227D20DA1CB587F1008F641B /* TableViewController.m */; };
+		227D21091CB61B4F008F641B /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		227D210A1CB61B52008F641B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
+		227D210B1CB61B79008F641B /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
+		227D210C1CB61B7D008F641B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
+		227D210D1CB61B84008F641B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
@@ -256,6 +261,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				227D210D1CB61B84008F641B /* Foundation.framework in Frameworks */,
+				227D210C1CB61B7D008F641B /* UIKit.framework in Frameworks */,
+				227D210B1CB61B79008F641B /* CoreGraphics.framework in Frameworks */,
+				227D21091CB61B4F008F641B /* Realm.framework in Frameworks */,
+				227D210A1CB61B52008F641B /* libc++.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1205,7 +1215,7 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = TableViewChangeNotifications/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.TableViewChangeNotifications;
@@ -1224,7 +1234,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = TableViewChangeNotifications/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.TableViewChangeNotifications;
@@ -1720,6 +1730,7 @@
 				227D20D61CB58756008F641B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		3F78C9C41B431CF300A0988E /* Build configuration list for PBXNativeTarget "RACTableView" */ = {
 			isa = XCConfigurationList;
