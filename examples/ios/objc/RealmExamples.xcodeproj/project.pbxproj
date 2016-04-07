@@ -12,6 +12,10 @@
 		0295B90119D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90219D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90319D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		227D20C41CB58756008F641B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 227D20C31CB58756008F641B /* main.m */; };
+		227D20C71CB58756008F641B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 227D20C61CB58756008F641B /* AppDelegate.m */; };
+		227D20D81CB5878E008F641B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 227D20D71CB5878E008F641B /* LaunchScreen.storyboard */; };
+		227D20DB1CB587F1008F641B /* TableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 227D20DA1CB587F1008F641B /* TableViewController.m */; };
 		3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
@@ -144,8 +148,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
+		227D20C01CB58756008F641B /* TableViewChangeNotifications.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TableViewChangeNotifications.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		227D20C31CB58756008F641B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		227D20C51CB58756008F641B /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		227D20C61CB58756008F641B /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		227D20D31CB58756008F641B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		227D20D71CB5878E008F641B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		227D20D91CB587F1008F641B /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableViewController.h; sourceTree = "<group>"; };
+		227D20DA1CB587F1008F641B /* TableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableViewController.m; sourceTree = "<group>"; };
 		3F78C9AB1B431CDF00A0988E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RACTableView/AppDelegate.h; sourceTree = "<group>"; };
 		3F78C9AC1B431CDF00A0988E /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewController.h; path = RACTableView/TableViewController.h; sourceTree = "<group>"; };
 		3F78C9AD1B431CDF00A0988E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RACTableView/Images.xcassets; sourceTree = "<group>"; };
@@ -240,6 +252,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		227D20BD1CB58756008F641B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3F78C9BC1B431CF300A0988E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -373,6 +392,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		227D20C11CB58756008F641B /* TableViewChangeNotifications */ = {
+			isa = PBXGroup;
+			children = (
+				227D20C51CB58756008F641B /* AppDelegate.h */,
+				227D20C61CB58756008F641B /* AppDelegate.m */,
+				227D20D91CB587F1008F641B /* TableViewController.h */,
+				227D20DA1CB587F1008F641B /* TableViewController.m */,
+				227D20D71CB5878E008F641B /* LaunchScreen.storyboard */,
+				227D20D31CB58756008F641B /* Info.plist */,
+				227D20C31CB58756008F641B /* main.m */,
+			);
+			path = TableViewChangeNotifications;
+			sourceTree = "<group>";
+		};
 		3F78C9AA1B431CB200A0988E /* RACTableView */ = {
 			isa = PBXGroup;
 			children = (
@@ -499,6 +532,7 @@
 				E8F70EA319BA5093006F60D5 /* REST */,
 				E8F70E8E19BA5083006F60D5 /* Simple */,
 				E8F70E9619BA508B006F60D5 /* TableView */,
+				227D20C11CB58756008F641B /* TableViewChangeNotifications */,
 				C0DC42091A7079D00067156A /* TodayExtension */,
 				0A73D4401B1442B200E1E8EE /* README.md */,
 			);
@@ -519,6 +553,7 @@
 				E8AB71DC19BA503500F3EDB4 /* Simple.app */,
 				E8AB726619BA504500F3EDB4 /* TableView.app */,
 				C0DC42061A7079D00067156A /* TodayExtension.appex */,
+				227D20C01CB58756008F641B /* TableViewChangeNotifications.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -619,6 +654,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		227D20BF1CB58756008F641B /* TableViewChangeNotifications */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 227D20D41CB58756008F641B /* Build configuration list for PBXNativeTarget "TableViewChangeNotifications" */;
+			buildPhases = (
+				227D20BC1CB58756008F641B /* Sources */,
+				227D20BD1CB58756008F641B /* Frameworks */,
+				227D20BE1CB58756008F641B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TableViewChangeNotifications;
+			productName = TableViewChangeNotifications;
+			productReference = 227D20C01CB58756008F641B /* TableViewChangeNotifications.app */;
+			productType = "com.apple.product-type.application";
+		};
 		3F78C9B51B431CF300A0988E /* RACTableView */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3F78C9C41B431CF300A0988E /* Build configuration list for PBXNativeTarget "RACTableView" */;
@@ -832,6 +884,9 @@
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
+					227D20BF1CB58756008F641B = {
+						CreatedOnToolsVersion = 7.3;
+					};
 					C0658DB31A76CBD8002F7A84 = {
 						CreatedOnToolsVersion = 6.2;
 						DevelopmentTeam = 9GCBJ97HG6;
@@ -892,11 +947,20 @@
 				E8AB726519BA504500F3EDB4 /* TableView */,
 				C0658DB31A76CBD8002F7A84 /* extension WatchKit Extension */,
 				C0658DBE1A76CBD8002F7A84 /* extension WatchKit App */,
+				227D20BF1CB58756008F641B /* TableViewChangeNotifications */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		227D20BE1CB58756008F641B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20D81CB5878E008F641B /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3F78C9C21B431CF300A0988E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -993,6 +1057,16 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		227D20BC1CB58756008F641B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227D20C71CB58756008F641B /* AppDelegate.m in Sources */,
+				227D20DB1CB587F1008F641B /* TableViewController.m in Sources */,
+				227D20C41CB58756008F641B /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3F78C9B81B431CF300A0988E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1120,6 +1194,44 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		227D20D51CB58756008F641B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = TableViewChangeNotifications/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.TableViewChangeNotifications;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		227D20D61CB58756008F641B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = TableViewChangeNotifications/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.TableViewChangeNotifications;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		3F78C9C51B431CF300A0988E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BD5E18798F030DC45369A649 /* Pods-RACTableView.debug.xcconfig */;
@@ -1601,6 +1713,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		227D20D41CB58756008F641B /* Build configuration list for PBXNativeTarget "TableViewChangeNotifications" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				227D20D51CB58756008F641B /* Debug */,
+				227D20D61CB58756008F641B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		3F78C9C41B431CF300A0988E /* Build configuration list for PBXNativeTarget "RACTableView" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
