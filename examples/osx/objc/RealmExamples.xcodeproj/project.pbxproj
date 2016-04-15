@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9EBC84541CC115AA00D52B47 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9EBC84531CC115AA00D52B47 /* main.m */; };
 		E823C33D19BA4A5F00D2FF5F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F1E82019BA4A3800FAD64E /* Foundation.framework */; };
 		E823C34D19BA4A7600D2FF5F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E823C34919BA4A7600D2FF5F /* main.m */; };
 		E823C34E19BA4A7600D2FF5F /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = E823C34B19BA4A7600D2FF5F /* Person.m */; };
@@ -16,6 +17,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		9EBC844F1CC115AA00D52B47 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		E823C33A19BA4A5F00D2FF5F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
@@ -30,6 +40,8 @@
 
 /* Begin PBXFileReference section */
 		0ADF47111B1578CF00F67B16 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
+		9EBC84511CC115AA00D52B47 /* Generator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Generator; sourceTree = BUILT_PRODUCTS_DIR; };
+		9EBC84531CC115AA00D52B47 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E823C33C19BA4A5F00D2FF5F /* JSONImport */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = JSONImport; sourceTree = BUILT_PRODUCTS_DIR; };
 		E823C34919BA4A7600D2FF5F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E823C34A19BA4A7600D2FF5F /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
@@ -41,6 +53,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		9EBC844E1CC115AA00D52B47 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E823C33919BA4A5F00D2FF5F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -54,11 +73,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9EBC84521CC115AA00D52B47 /* Generator */ = {
+			isa = PBXGroup;
+			children = (
+				9EBC84531CC115AA00D52B47 /* main.m */,
+			);
+			path = Generator;
+			sourceTree = "<group>";
+		};
 		E823C34819BA4A7600D2FF5F /* JSONImport */ = {
 			isa = PBXGroup;
 			children = (
-				E823C34919BA4A7600D2FF5F /* main.m */,
 				E823C34A19BA4A7600D2FF5F /* Person.h */,
+				E823C34919BA4A7600D2FF5F /* main.m */,
 				E823C34B19BA4A7600D2FF5F /* Person.m */,
 				E823C34C19BA4A7600D2FF5F /* persons.json */,
 			);
@@ -70,6 +97,7 @@
 			children = (
 				0ADF47111B1578CF00F67B16 /* README.md */,
 				E823C34819BA4A7600D2FF5F /* JSONImport */,
+				9EBC84521CC115AA00D52B47 /* Generator */,
 				E8F1E81F19BA4A3800FAD64E /* Frameworks */,
 				E8F1E81E19BA4A3800FAD64E /* Products */,
 			);
@@ -79,6 +107,7 @@
 			isa = PBXGroup;
 			children = (
 				E823C33C19BA4A5F00D2FF5F /* JSONImport */,
+				9EBC84511CC115AA00D52B47 /* Generator */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -96,6 +125,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		9EBC84501CC115AA00D52B47 /* Generator */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9EBC84551CC115AA00D52B47 /* Build configuration list for PBXNativeTarget "Generator" */;
+			buildPhases = (
+				9EBC844D1CC115AA00D52B47 /* Sources */,
+				9EBC844E1CC115AA00D52B47 /* Frameworks */,
+				9EBC844F1CC115AA00D52B47 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Generator;
+			productName = Generator;
+			productReference = 9EBC84511CC115AA00D52B47 /* Generator */;
+			productType = "com.apple.product-type.tool";
+		};
 		E823C33B19BA4A5F00D2FF5F /* JSONImport */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E823C34719BA4A5F00D2FF5F /* Build configuration list for PBXNativeTarget "JSONImport" */;
@@ -121,6 +167,11 @@
 			attributes = {
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = Realm;
+				TargetAttributes = {
+					9EBC84501CC115AA00D52B47 = {
+						CreatedOnToolsVersion = 7.3;
+					};
+				};
 			};
 			buildConfigurationList = E8F1E81819BA4A3800FAD64E /* Build configuration list for PBXProject "RealmExamples" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -135,11 +186,20 @@
 			projectRoot = "";
 			targets = (
 				E823C33B19BA4A5F00D2FF5F /* JSONImport */,
+				9EBC84501CC115AA00D52B47 /* Generator */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		9EBC844D1CC115AA00D52B47 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9EBC84541CC115AA00D52B47 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E823C33819BA4A5F00D2FF5F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -152,6 +212,37 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		9EBC84561CC115AA00D52B47 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_IDENTITY = "-";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		9EBC84571CC115AA00D52B47 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		E823C34519BA4A5F00D2FF5F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -251,6 +342,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9EBC84551CC115AA00D52B47 /* Build configuration list for PBXNativeTarget "Generator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9EBC84561CC115AA00D52B47 /* Debug */,
+				9EBC84571CC115AA00D52B47 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		E823C34719BA4A5F00D2FF5F /* Build configuration list for PBXNativeTarget "JSONImport" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
