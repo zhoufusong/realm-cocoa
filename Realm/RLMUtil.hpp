@@ -198,3 +198,21 @@ id RLMMixedToObjc(realm::Mixed const& value);
 // For unit testing purposes, allow an Objective-C class named FakeObject to also be used
 // as the base class of managed objects. This allows for testing invalid schemas.
 void RLMSetTreatFakeObjectAsRLMObject(BOOL flag);
+
+template<typename T>
+class RLMObjcRuntimeArray {
+public:
+    template<typename Fn, typename... Args>
+    RLMObjcRuntimeArray(Fn fn, Args... args)
+    : m_data(fn(args..., &m_size), &::free) { }
+
+    unsigned int size() const { return m_size; }
+    T operator[](size_t i) const { return m_data[i]; }
+    T *begin() const { return m_data ? &m_data[0] : nullptr; }
+    T *end() const { return m_data ? &m_data[m_size] : nullptr; }
+    T* get() const { return m_data.get(); }
+
+private:
+    std::unique_ptr<T[], decltype(&::free)> m_data;
+    unsigned int m_size;
+};

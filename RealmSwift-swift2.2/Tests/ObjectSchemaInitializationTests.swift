@@ -231,10 +231,14 @@ enum SwiftEnum {
 
 class SwiftObjectWithEnum: SwiftFakeObject {
     var swiftEnum = SwiftEnum.Case1
+    var optionalSwiftEnum: SwiftEnum? = .Case1
+    var nilOptionalSwiftNum: SwiftEnum? = nil
 }
 
 class SwiftObjectWithStruct: SwiftFakeObject {
     var swiftStruct = SortDescriptor(property: "prop")
+    var optionalSwiftStruct: SortDescriptor? = SortDescriptor(property: "prop")
+    var nilOptionalSwiftStruct: SortDescriptor? = nil
 }
 
 class SwiftObjectWithDatePrimaryKey: SwiftFakeObject {

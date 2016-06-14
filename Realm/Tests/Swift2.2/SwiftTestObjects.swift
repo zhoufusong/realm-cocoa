@@ -135,7 +135,7 @@ class SwiftLinkSourceObject: RLMObject {
 
 class SwiftLinkTargetObject: RLMObject {
     dynamic var id = 0
-    dynamic var backlinks: RLMLinkingObjects?
+    dynamic let backlinks: RLMLinkingObjects? = nil
 
     override class func linkingObjectsProperties() -> [String : RLMPropertyDescriptor] {
         return ["backlinks": RLMPropertyDescriptor(withClass: SwiftLinkSourceObject.self, propertyName: "link")]

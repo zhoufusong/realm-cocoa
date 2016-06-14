@@ -20,7 +20,7 @@
 
 #import <objc/runtime.h>
 
-@class RLMObjectBase;
+@class RLMObject, RLMObjectBase;
 
 FOUNDATION_EXTERN BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType);
 FOUNDATION_EXTERN BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType);
@@ -34,15 +34,18 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType);
 }
 
 - (instancetype)initWithName:(NSString *)name
+             containingClass:(Class)objectClass
                      indexed:(BOOL)indexed
+                    required:(BOOL)required
       linkPropertyDescriptor:(RLMPropertyDescriptor *)linkPropertyDescriptor
-                    property:(objc_property_t)property;
+                    property:(objc_property_t)property
+               swiftInstance:(RLMObject *)swiftObjectInstance;
 
 - (instancetype)initSwiftPropertyWithName:(NSString *)name
                                   indexed:(BOOL)indexed
-                   linkPropertyDescriptor:(RLMPropertyDescriptor *)linkPropertyDescriptor
+                                 optional:(BOOL)optional
                                  property:(objc_property_t)property
-                                 instance:(RLMObjectBase *)objectInstance;
+                                 instance:(RLMObjectBase *)swiftObjectInstance;
 
 - (instancetype)initSwiftListPropertyWithName:(NSString *)name
                                          ivar:(Ivar)ivar
@@ -107,4 +110,3 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType);
                      indexed:(BOOL)indexed
                     optional:(BOOL)optional;
 @end
-

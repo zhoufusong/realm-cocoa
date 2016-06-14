@@ -325,32 +325,11 @@ public class ObjectUtil: NSObject {
         return swiftLanguageVersion
     }
 
-    @objc private class func ignoredPropertiesForClass(type: AnyClass) -> NSArray? {
-        if let type = type as? Object.Type {
-            return type.ignoredProperties() as NSArray?
-        }
-        return nil
-    }
-
     @objc private class func indexedPropertiesForClass(type: AnyClass) -> NSArray? {
         if let type = type as? Object.Type {
             return type.indexedProperties() as NSArray?
         }
         return nil
-    }
-
-    @objc private class func linkingObjectsPropertiesForClass(type: AnyClass) -> NSDictionary? {
-        // Not used for Swift. getLinkingObjectsProperties(_:) is used instead.
-        return nil
-    }
-
-    // Get the names of all properties in the object which are of type List<>.
-    @objc private class func getGenericListPropertyNames(object: AnyObject) -> NSArray {
-        return Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
-            return prop.value.dynamicType is RLMListBase.Type
-        }.flatMap { (prop: Mirror.Child) in
-            return prop.label
-        }
     }
 
     @objc private class func initializeListProperty(object: RLMObjectBase, property: RLMProperty, array: RLMArray) {
@@ -364,58 +343,64 @@ public class ObjectUtil: NSObject {
     }
 
     // swiftlint:disable:next cyclomatic_complexity
-    @objc private class func getOptionalProperties(object: AnyObject) -> NSDictionary {
-        let children = Mirror(reflecting: object).children
-        return children.reduce([String: AnyObject]()) { ( properties: [String:AnyObject], prop: Mirror.Child) in
-            guard let name = prop.label else { return properties }
+    @objc private class func getProperties(object: RLMObjectBase, names: NSMutableArray,
+                                           optional: NSMutableSet, numberTypes: NSMutableDictionary) {
+        let ignoredProperties: [String] = {
+            if let object = object as? Object {
+                return object.dynamicType.ignoredProperties()
+            }
+            return []
+        }()
+        for prop in Mirror(reflecting: object).children {
+            guard let name = prop.label else { continue }
+            guard !ignoredProperties.contains(name) else { continue }
+
+            // A Swift lazy var shows up as two separate children on the reflection
+            // tree: one named 'x', and another that is optional and is named
+            // 'x.storage'. Note that '.' is illegal in either a Swift or
+            // Objective-C property name.
+            let storageSuffix = ".storage"
+            if name.hasSuffix(storageSuffix) {
+                let baseName = String(name.characters.dropLast(storageSuffix.characters.count))
+                if ignoredProperties.contains(baseName) {
+                    // This is the storage for an ignored lazy property
+                    continue
+                }
+                throwRealmException("Lazy managed property '\(baseName)' is not allowed on a Realm Swift object class. Either add the property to the ignored properties list or make it non-lazy.")
+            }
+
             let mirror = Mirror(reflecting: prop.value)
+            guard mirror.displayStyle != .Struct else { continue }
+            guard mirror.displayStyle != .Enum else { continue }
+
             let type = mirror.subjectType
-            var properties = properties
             if type is Optional<String>.Type || type is Optional<NSString>.Type {
-                properties[name] = Int(PropertyType.String.rawValue)
+                optional.addObject(name)
             } else if type is Optional<NSDate>.Type {
-                properties[name] = Int(PropertyType.Date.rawValue)
+                optional.addObject(name)
             } else if type is Optional<NSData>.Type {
-                properties[name] = Int(PropertyType.Data.rawValue)
+                optional.addObject(name)
             } else if type is Optional<Object>.Type {
-                properties[name] = Int(PropertyType.Object.rawValue)
+                optional.addObject(name)
             } else if type is RealmOptional<Int>.Type ||
                       type is RealmOptional<Int8>.Type ||
                       type is RealmOptional<Int16>.Type ||
                       type is RealmOptional<Int32>.Type ||
                       type is RealmOptional<Int64>.Type {
-                properties[name] = Int(PropertyType.Int.rawValue)
+                numberTypes[name] = Int(PropertyType.Int.rawValue)
             } else if type is RealmOptional<Float>.Type {
-                properties[name] = Int(PropertyType.Float.rawValue)
+                numberTypes[name] = Int(PropertyType.Float.rawValue)
             } else if type is RealmOptional<Double>.Type {
-                properties[name] = Int(PropertyType.Double.rawValue)
+                numberTypes[name] = Int(PropertyType.Double.rawValue)
             } else if type is RealmOptional<Bool>.Type {
-                properties[name] = Int(PropertyType.Bool.rawValue)
+                numberTypes[name] = Int(PropertyType.Bool.rawValue)
             } else if prop.value as? RLMOptionalBase != nil {
                 throwRealmException("'\(type)' is not a a valid RealmOptional type.")
             } else if mirror.displayStyle == .Optional {
-                properties[name] = NSNull()
+                optional.addObject(name)
             }
-            return properties
-        }
-    }
 
-    @objc private class func requiredPropertiesForClass(_: AnyClass) -> NSArray? {
-        return nil
-    }
-
-    // Get information about each of the linking objects properties.
-    @objc private class func getLinkingObjectsProperties(object: AnyObject) -> NSDictionary {
-        let properties = Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
-            return prop.value as? LinkingObjectsBase != nil
-        }.flatMap { (prop: Mirror.Child) in
-            (prop.label!, prop.value as! LinkingObjectsBase)
-        }
-        return properties.reduce([:] as [String : [String: String ]]) { (dictionary, property) in
-            var d = dictionary
-            let (name, results) = property
-            d[name] = ["class": results.objectClassName, "property": results.propertyName]
-            return d
+            names.addObject(name)
         }
     }
 

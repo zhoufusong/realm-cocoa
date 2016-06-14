@@ -280,14 +280,13 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 }
 
 - (bool)parseObjcProperty:(objc_property_t)property {
-    unsigned int count;
-    objc_property_attribute_t *attrs = property_copyAttributeList(property, &count);
+    RLMObjcRuntimeArray<objc_property_attribute_t> attrs(property_copyAttributeList, property);
 
     bool isReadOnly = false;
-    for (size_t i = 0; i < count; ++i) {
-        switch (*attrs[i].name) {
+    for (auto attr : attrs) {
+        switch (*attr.name) {
             case 'T':
-                _objcRawType = @(attrs[i].value);
+                _objcRawType = @(attr.value);
                 break;
             case 'R':
                 isReadOnly = true;
@@ -299,25 +298,24 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
                 // dynamic
                 break;
             case 'G':
-                _getterName = @(attrs[i].value);
+                _getterName = @(attr.value);
                 break;
             case 'S':
-                _setterName = @(attrs[i].value);
+                _setterName = @(attr.value);
                 break;
             default:
                 break;
         }
     }
-    free(attrs);
 
     return isReadOnly;
 }
 
 - (instancetype)initSwiftPropertyWithName:(NSString *)name
                                   indexed:(BOOL)indexed
-                   linkPropertyDescriptor:(RLMPropertyDescriptor *)linkPropertyDescriptor
+                                 optional:(BOOL)optional
                                  property:(objc_property_t)property
-                                 instance:(RLMObject *)obj {
+                                 instance:(RLMObjectBase *)obj {
     self = [super init];
     if (!self) {
         return nil;
@@ -326,53 +324,18 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     _name = name;
     _indexed = indexed;
 
-    if (linkPropertyDescriptor) {
-        _objectClassName = [linkPropertyDescriptor.objectClass className];
-        _linkOriginPropertyName = linkPropertyDescriptor.propertyName;
-    }
-
     if ([self parseObjcProperty:property]) {
         return nil;
     }
 
-    id propertyValue = [obj valueForKey:_name];
-
-    // convert array types to objc variant
-    if ([_objcRawType isEqualToString:@"@\"RLMArray\""]) {
-        _objcRawType = [NSString stringWithFormat:@"@\"RLMArray<%@>\"", [propertyValue objectClassName]];
-    }
-    else if ([_objcRawType isEqualToString:@"@\"NSNumber\""]) {
-        const char *numberType = [propertyValue objCType];
-        switch (*numberType) {
-            case 'i':
-            case 'l':
-            case 'q':
-                _objcRawType = @"@\"NSNumber<RLMInt>\"";
-                break;
-            case 'f':
-                _objcRawType = @"@\"NSNumber<RLMFloat>\"";
-                break;
-            case 'd':
-                _objcRawType = @"@\"NSNumber<RLMDouble>\"";
-                break;
-            case 'B':
-            case 'c':
-                _objcRawType = @"@\"NSNumber<RLMBool>\"";
-                break;
-            default:
-                @throw RLMException(@"Can't persist NSNumber of type '%s': only integers, floats, doubles, and bools are currently supported.", numberType);
-        }
-    }
-
-    auto throwForPropertyName = ^(NSString *propertyName){
+    if (![self setTypeFromRawType]) {
         @throw RLMException(@"Can't persist property '%@' with incompatible type. "
                             "Add to Object.ignoredProperties() class method to ignore.",
-                            propertyName);
-    };
-
-    if (![self setTypeFromRawType]) {
-        throwForPropertyName(self.name);
+                            _name);
     }
+
+    // Note: needs to be after setFromRawType as that sets default optionality for obj-c
+    _optional = optional;
 
     if (_objcType == 'c') {
         // Check if it's a BOOL or Int8 by trying to set it to 2 and seeing if
@@ -382,16 +345,23 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
         _type = value.intValue == 2 ? RLMPropertyTypeInt : RLMPropertyTypeBool;
     }
 
-    // update getter/setter names
+    if (_type == RLMPropertyTypeObject && !optional) {
+        @throw RLMException(@"The `%@.%@` property must be marked as being optional.",
+                            [obj class], _name);
+    }
+
     [self updateAccessors];
 
     return self;
 }
 
 - (instancetype)initWithName:(NSString *)name
+             containingClass:(Class)objectClass
                      indexed:(BOOL)indexed
+                    required:(BOOL)required
       linkPropertyDescriptor:(RLMPropertyDescriptor *)linkPropertyDescriptor
                     property:(objc_property_t)property
+               swiftInstance:(RLMObject *)swiftObjectInstance
 {
     self = [super init];
     if (!self) {
@@ -412,6 +382,35 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
         return nil;
     }
 
+    if (swiftObjectInstance) {
+        // convert array types to objc variant
+        if ([_objcRawType isEqualToString:@"@\"RLMArray\""]) {
+            _objcRawType = [NSString stringWithFormat:@"@\"RLMArray<%@>\"", [[swiftObjectInstance valueForKey:_name] objectClassName]];
+        }
+        else if ([_objcRawType isEqualToString:@"@\"NSNumber\""]) {
+            const char *numberType = [[swiftObjectInstance valueForKey:_name] objCType];
+            switch (*numberType) {
+                case 'i':
+                case 'l':
+                case 'q':
+                    _objcRawType = @"@\"NSNumber<RLMInt>\"";
+                    break;
+                case 'f':
+                    _objcRawType = @"@\"NSNumber<RLMFloat>\"";
+                    break;
+                case 'd':
+                    _objcRawType = @"@\"NSNumber<RLMDouble>\"";
+                    break;
+                case 'B':
+                case 'c':
+                    _objcRawType = @"@\"NSNumber<RLMBool>\"";
+                    break;
+                default:
+                    @throw RLMException(@"Can't persist NSNumber of type '%s': only integers, floats, doubles, and bools are currently supported.", numberType);
+            }
+        }
+    }
+
     if (![self setTypeFromRawType]) {
         @throw RLMException(@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", self.name);
@@ -422,7 +421,22 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
                             self.name, RLMTypeToString(_type));
     }
 
-    // update getter/setter names
+    if (required && _type == RLMPropertyTypeObject) {
+        @throw RLMException(@"Object properties cannot be made required, "
+                            "but '+[%@ requiredProperties]' included '%@'", objectClass, name);
+    }
+    if (required) {
+        _optional = false;
+    }
+
+    if (swiftObjectInstance && _objcType == 'c') {
+        // Check if it's a BOOL or Int8 by trying to set it to 2 and seeing if
+        // it actually sets it to 1.
+        [swiftObjectInstance setValue:@2 forKey:name];
+        NSNumber *value = [swiftObjectInstance valueForKey:name];
+        _type = value.intValue == 2 ? RLMPropertyTypeInt : RLMPropertyTypeBool;
+    }
+
     [self updateAccessors];
 
     return self;

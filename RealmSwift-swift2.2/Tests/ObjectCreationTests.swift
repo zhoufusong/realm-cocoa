@@ -132,6 +132,18 @@ class ObjectCreationTests: TestCase {
         }
     }
 
+    func testInitOptionalsWithArray() {
+        let values = ["a", "b", "c".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
+                      NSDate(timeIntervalSince1970: 4),
+                      5, 6, 7, 8, 9, 10.1, 11.1, true, NSNull()] as [NSObject]
+        let obj = SwiftOptionalObject(value: values)
+        let props = obj.objectSchema.properties
+        for i in 0..<props.count - 1 {
+            XCTAssertEqual(obj[props[i].name] as? NSObject, values[i])
+        }
+        XCTAssertNil(obj.optObjectCol)
+    }
+
     func testInitWithKVCObject() {
         // test with kvc object
         let objectWithInt = SwiftObject(value: ["intCol": 200])

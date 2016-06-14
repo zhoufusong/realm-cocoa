@@ -402,29 +402,12 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 }
 
 @implementation RLMObjectUtil
-
-+ (NSArray *)ignoredPropertiesForClass:(Class)cls {
-    return [cls ignoredProperties];
-}
-
 + (NSArray *)indexedPropertiesForClass:(Class)cls {
     return [cls indexedProperties];
 }
 
-+ (NSDictionary *)linkingObjectsPropertiesForClass:(Class)cls {
-    return [cls linkingObjectsProperties];
-}
-
-+ (NSDictionary *)linkingObjectProperties:(__unused id)object {
-    return nil;
-}
-
-+ (NSArray *)getGenericListPropertyNames:(__unused id)obj {
-    return nil;
-}
-
-+ (NSDictionary *)getLinkingObjectsProperties:(__unused id)obj {
-    return nil;
++ (void)getProperties:(__unused RLMObjectBase *)object names:(__unused NSMutableArray *)names
+             optional:(__unused NSMutableSet *)optional numberTypes:(__unused NSMutableDictionary *)numberTypes {
 }
 
 + (void)initializeListProperty:(__unused RLMObjectBase *)object property:(__unused RLMProperty *)property array:(__unused RLMArray *)array {
@@ -435,13 +418,4 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 
 + (void)initializeLinkingObjectsProperty:(__unused RLMObjectBase *)object property:(__unused RLMProperty *)property {
 }
-
-+ (NSDictionary *)getOptionalProperties:(__unused id)obj {
-    return nil;
-}
-
-+ (NSArray *)requiredPropertiesForClass:(Class)cls {
-    return [cls requiredProperties];
-}
-
 @end

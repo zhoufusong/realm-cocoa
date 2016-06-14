@@ -183,141 +183,121 @@ using namespace realm;
 
 + (NSArray *)propertiesForClass:(Class)objectClass isSwift:(bool)isSwiftClass {
     Class objectUtil = [objectClass objectUtilClass:isSwiftClass];
-    NSArray *ignoredProperties = [objectUtil ignoredPropertiesForClass:objectClass];
-    NSDictionary *linkingObjectsProperties = [objectUtil linkingObjectsPropertiesForClass:objectClass];
+    NSArray *indexed = [objectUtil indexedPropertiesForClass:objectClass];
 
-    // For Swift classes we need an instance of the object when parsing properties
-    id swiftObjectInstance = isSwiftClass ? [[objectClass alloc] init] : nil;
+    RLMObjcRuntimeArray<objc_property_t> props(class_copyPropertyList, objectClass);
+    NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:props.size()];
+    auto addProperty = [propArray](RLMProperty *prop) {
+        if (prop) {
+            [propArray addObject:prop];
+        }
+    };
 
-    unsigned int count;
-    objc_property_t *props = class_copyPropertyList(objectClass, &count);
-    NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
-    NSSet *indexed = [[NSSet alloc] initWithArray:[objectUtil indexedPropertiesForClass:objectClass]];
-    for (unsigned int i = 0; i < count; i++) {
-        NSString *propertyName = @(property_getName(props[i]));
-        if ([ignoredProperties containsObject:propertyName]) {
+    if (!isSwiftClass || RLMIsKindOfClass(objectClass, RLMObject.class)) {
+        if (props.size() == 0) {
+            return @[];
+        }
+
+        NSArray *ignoredProperties = [objectClass ignoredProperties];
+        auto requiredProperties = [objectClass requiredProperties];
+        NSDictionary *linkingObjectsProperties = [objectClass linkingObjectsProperties];
+
+        // For Swift classes we need an instance of the object when parsing properties
+        id swiftObjectInstance = isSwiftClass ? [[objectClass alloc] init] : nil;
+
+        for (auto prop : props) {
+            NSString *propertyName = @(property_getName(prop));
+            if ([ignoredProperties containsObject:propertyName]) {
+                continue;
+            }
+
+            addProperty([[RLMProperty alloc] initWithName:propertyName
+                                          containingClass:objectClass
+                                                  indexed:[indexed containsObject:propertyName]
+                                                 required:[requiredProperties containsObject:propertyName]
+                                   linkPropertyDescriptor:linkingObjectsProperties[propertyName]
+                                                 property:prop
+                                            swiftInstance:swiftObjectInstance]);
+        }
+        return propArray;
+    }
+    // Otherwise RealmSwift.Object subclass
+
+    id objectInstance = [[objectClass alloc] init];
+
+    // Generic properties aren't registered with the obj-c runtime and we can't
+    // tell if string/data/date properties are optioanl from obj-c, so we need
+    // to get that information from Swift's reflection
+    // Note that the Swift functionality takes care of filtering out ignored
+    // properties and things like the backing properties for Lazy properties
+    auto propertyNames = [NSMutableArray new];
+    auto optionalProperties = [NSMutableSet new];
+    auto numericPropertyTypes = [NSMutableDictionary new];
+    [objectUtil getProperties:objectInstance
+                        names:propertyNames
+                     optional:optionalProperties
+                  numberTypes:numericPropertyTypes];
+
+    for (NSString *propertyName in propertyNames) {
+        // First check for a matching obj-c property for non-generics so that
+        // we can reuse as much of the handling for those as possible.
+        const char *name = propertyName.UTF8String;
+        auto objcProp = std::find_if(props.begin(), props.end(),
+                                     [&](auto prop) { return !strcmp(property_getName(prop), name); });
+        if (objcProp != props.end()) {
+            addProperty([[RLMProperty alloc] initSwiftPropertyWithName:propertyName
+                                                               indexed:[indexed containsObject:propertyName]
+                                                              optional:[optionalProperties containsObject:propertyName]
+                                                              property:*objcProp
+                                                              instance:objectInstance]);
             continue;
         }
 
-        RLMProperty *prop = nil;
-        if (isSwiftClass) {
-            prop = [[RLMProperty alloc] initSwiftPropertyWithName:propertyName
-                                                          indexed:[indexed containsObject:propertyName]
-                                           linkPropertyDescriptor:linkingObjectsProperties[propertyName]
-                                                         property:props[i]
-                                                         instance:swiftObjectInstance];
-        }
-        else {
-            prop = [[RLMProperty alloc] initWithName:propertyName
-                                             indexed:[indexed containsObject:propertyName]
-                              linkPropertyDescriptor:linkingObjectsProperties[propertyName]
-                                            property:props[i]];
+        // All of our supported Swift optional types produce obj-c properties,
+        // so any others must be of an unsupported type
+        if ([optionalProperties containsObject:propertyName]) {
+            continue;
         }
 
-        if (prop) {
-            [propArray addObject:prop];
-         }
+        // Everything involving a generic managed process is done by reading the
+        // ivar directly, so it needs to exist and needs to be an object
+        Ivar ivar = class_getInstanceVariable(objectClass, propertyName.UTF8String);
+        if (!ivar) {
+            continue;
+        }
+
+        // If we have a number type then this is a RealmOptional<T> where T
+        // is one of Int, Float, etc.
+        if (NSNumber *boxedType = numericPropertyTypes[propertyName]) {
+            addProperty([[RLMProperty alloc] initSwiftOptionalPropertyWithName:propertyName
+                                                                       indexed:[indexed containsObject:propertyName]
+                                                                          ivar:ivar
+                                                                  propertyType:static_cast<RLMPropertyType>(boxedType.intValue)]);
+            continue;
+        }
+
+        // If we got here it's either a List<> or LinkingObjects<>
+        // Both of these we need to introspect the property value
+        id value = object_getIvar(objectInstance, ivar);
+        if (auto listBase = RLMDynamicCast<RLMListBase>(value)) {
+            addProperty([[RLMProperty alloc] initSwiftListPropertyWithName:propertyName
+                                                                      ivar:ivar
+                                                           objectClassName:listBase._rlmArray.objectClassName]);
+            continue;
+        }
+
+        if ([value respondsToSelector:@selector(objectClassName)] && [value respondsToSelector:@selector(propertyName)]) {
+            addProperty([[RLMProperty alloc] initSwiftLinkingObjectsPropertyWithName:propertyName
+                                                                                ivar:ivar
+                                                                     objectClassName:[value objectClassName]
+                                                              linkOriginPropertyName:[value propertyName]]);
+            continue;
+        }
+
+        // Otherwise it's an unrecongized property of a type not reported to the
+        // obj-c runtime. For now we ignore these rather than producing an error
+        // as it would be a breaking change to reject them.
     }
-    free(props);
-
-    if (isSwiftClass) {
-        // List<> properties don't show up as objective-C properties due to
-        // being generic, so use Swift reflection to get a list of them, and
-        // then access their ivars directly
-        for (NSString *propName in [objectUtil getGenericListPropertyNames:swiftObjectInstance]) {
-            Ivar ivar = class_getInstanceVariable(objectClass, propName.UTF8String);
-            id value = object_getIvar(swiftObjectInstance, ivar);
-            NSString *className = [value _rlmArray].objectClassName;
-            NSUInteger existing = [propArray indexOfObjectPassingTest:^BOOL(RLMProperty *obj, __unused NSUInteger idx, __unused BOOL *stop) {
-                return [obj.name isEqualToString:propName];
-            }];
-            if (existing != NSNotFound) {
-                [propArray removeObjectAtIndex:existing];
-            }
-            [propArray addObject:[[RLMProperty alloc] initSwiftListPropertyWithName:propName
-                                                                               ivar:ivar
-                                                                    objectClassName:className]];
-        }
-
-        // Ditto for LinkingObjects<> properties.
-        NSDictionary *linkingObjectsProperties = [objectUtil getLinkingObjectsProperties:swiftObjectInstance];
-        for (NSString *propName in linkingObjectsProperties) {
-            NSDictionary *info = linkingObjectsProperties[propName];
-            Ivar ivar = class_getInstanceVariable(objectClass, propName.UTF8String);
-
-            NSUInteger existing = [propArray indexOfObjectPassingTest:^BOOL(RLMProperty *obj, __unused NSUInteger idx, __unused BOOL *stop) {
-                return [obj.name isEqualToString:propName];
-            }];
-            if (existing != NSNotFound) {
-                [propArray removeObjectAtIndex:existing];
-            }
-
-            [propArray addObject:[[RLMProperty alloc] initSwiftLinkingObjectsPropertyWithName:propName
-                                                                                         ivar:ivar
-                                                                              objectClassName:info[@"class"]
-                                                                       linkOriginPropertyName:info[@"property"]]];
-        }
-    }
-
-    if (auto optionalProperties = [objectUtil getOptionalProperties:swiftObjectInstance]) {
-        for (RLMProperty *property in propArray) {
-            property.optional = false;
-        }
-        [optionalProperties enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, NSNumber *propertyType, __unused BOOL *stop) {
-            if ([ignoredProperties containsObject:propertyName]) {
-                return;
-            }
-            NSUInteger existing = [propArray indexOfObjectPassingTest:^BOOL(RLMProperty *obj, __unused NSUInteger idx, __unused BOOL *stop) {
-                return [obj.name isEqualToString:propertyName];
-            }];
-            RLMProperty *property;
-            if (existing != NSNotFound) {
-                property = propArray[existing];
-                property.optional = true;
-            }
-            if (auto type = RLMCoerceToNil(propertyType)) {
-                if (existing == NSNotFound) {
-                    // Check to see if this optional property is an underlying storage property for a Swift lazy var.
-                    // Managed lazy vars are't allowed.
-                    // NOTE: Revisit this once property behaviors are implemented in Swift.
-                    if (NSString *lazyPropertyBaseName = [self baseNameForLazySwiftProperty:propertyName]) {
-                        if ([ignoredProperties containsObject:lazyPropertyBaseName]) {
-                            // This property is the storage property for a ignored lazy Swift property. Just continue.
-                            return;
-                        } else {
-                            @throw RLMException(@"Lazy managed property '%@' is not allowed on a Realm Swift object class. Either add the property to the ignored properties list or make it non-lazy.", lazyPropertyBaseName);
-                        }
-                    }
-                    // The current property isn't a storage property for a lazy Swift property.
-                    property = [[RLMProperty alloc] initSwiftOptionalPropertyWithName:propertyName
-                                                                              indexed:[indexed containsObject:propertyName]
-                                                                                 ivar:class_getInstanceVariable(objectClass, propertyName.UTF8String)
-                                                                         propertyType:RLMPropertyType(type.intValue)];
-                    [propArray addObject:property];
-                }
-                else {
-                    property.type = RLMPropertyType(type.intValue);
-                }
-            }
-        }];
-    }
-    if (auto requiredProperties = [objectUtil requiredPropertiesForClass:objectClass]) {
-        for (RLMProperty *property in propArray) {
-            bool required = [requiredProperties containsObject:property.name];
-            if (required && property.type == RLMPropertyTypeObject) {
-                @throw RLMException(@"Object properties cannot be made required, "
-                                    "but '+[%@ requiredProperties]' included '%@'", objectClass, property.name);
-            }
-            property.optional &= !required;
-        }
-    }
-
-    for (RLMProperty *property in propArray) {
-        if (!property.optional && property.type == RLMPropertyTypeObject) { // remove if/when core supports required link columns
-            @throw RLMException(@"The `%@.%@` property must be marked as being optional.", [objectClass className], property.name);
-        }
-    }
-
     return propArray;
 }
 

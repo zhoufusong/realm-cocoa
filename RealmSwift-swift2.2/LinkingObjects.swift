@@ -22,8 +22,8 @@ import Realm
 /// :nodoc:
 /// Internal class. Do not use directly. Used for reflection and initialization
 public class LinkingObjectsBase: NSObject, NSFastEnumeration {
-    internal let objectClassName: String
-    internal let propertyName: String
+    @objc internal let objectClassName: String
+    @objc internal let propertyName: String
 
     private var cachedRLMResults: RLMResults?
     private var object: RLMWeakObjectHandle?

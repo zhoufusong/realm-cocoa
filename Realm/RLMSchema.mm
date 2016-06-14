@@ -223,10 +223,8 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
         try {
             // Make sure we've discovered all classes
             {
-                unsigned int numClasses;
-                using malloc_ptr = std::unique_ptr<__unsafe_unretained Class[], decltype(&free)>;
-                malloc_ptr classes(objc_copyClassList(&numClasses), &free);
-                RLMRegisterClassLocalNames(classes.get(), numClasses);
+                RLMObjcRuntimeArray<__unsafe_unretained Class> classes(objc_copyClassList);
+                RLMRegisterClassLocalNames(classes.get(), classes.size());
             }
 
             [s_localNameToClass enumerateKeysAndObjectsUsingBlock:^(NSString *, Class cls, BOOL *) {
@@ -276,9 +274,8 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
     // className might be the local name of a Swift class we haven't registered
     // yet, so scan them all then recheck
     {
-        unsigned int numClasses;
-        std::unique_ptr<__unsafe_unretained Class[], decltype(&free)> classes(objc_copyClassList(&numClasses), &free);
-        RLMRegisterClassLocalNames(classes.get(), numClasses);
+        RLMObjcRuntimeArray<__unsafe_unretained Class> classes(objc_copyClassList);
+        RLMRegisterClassLocalNames(classes.get(), classes.size());
     }
 
     return s_localNameToClass[className];

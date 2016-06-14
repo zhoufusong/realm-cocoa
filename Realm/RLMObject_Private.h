@@ -94,18 +94,13 @@ FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 @class RLMProperty, RLMArray;
 @interface RLMObjectUtil : NSObject
 
-+ (NSArray<NSString *> *)ignoredPropertiesForClass:(Class)cls;
 + (NSArray<NSString *> *)indexedPropertiesForClass:(Class)cls;
-+ (NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)linkingObjectsPropertiesForClass:(Class)cls;
 
-+ (NSArray<NSString *> *)getGenericListPropertyNames:(id)obj;
-+ (NSDictionary<NSString *, NSString *> *)getLinkingObjectsProperties:(id)object;
++ (void)getProperties:(RLMObjectBase *)object names:(NSMutableArray *)names
+             optional:(NSMutableSet *)optional numberTypes:(NSMutableDictionary *)numberTypes;
 
 + (void)initializeListProperty:(RLMObjectBase *)object property:(RLMProperty *)property array:(RLMArray *)array;
 + (void)initializeOptionalProperty:(RLMObjectBase *)object property:(RLMProperty *)property;
 + (void)initializeLinkingObjectsProperty:(RLMObjectBase *)object property:(RLMProperty *)property;
-
-+ (NSDictionary<NSString *, NSNumber *> *)getOptionalProperties:(id)obj;
-+ (NSArray<NSString *> *)requiredPropertiesForClass:(Class)cls;
 
 @end
