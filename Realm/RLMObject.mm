@@ -16,13 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMObject_Private.hpp"
+
 #import "RLMAccessor.h"
-#import "RLMObject_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
-#import "RLMSchema_Private.h"
-#import "RLMRealm_Private.hpp"
 #import "RLMQueryUtil.hpp"
+#import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
 
 // We declare things in RLMObject which are actually implemented in RLMObjectBase
 // for documentation's sake, which leads to -Wunimplemented-method warnings.
@@ -45,9 +46,8 @@
     return [super initWithValue:value schema:schema];
 }
 
-- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
-                       schema:(__unsafe_unretained RLMObjectSchema *const)schema {
-    return [super initWithRealm:realm schema:schema];
+- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm schema:(RLMObjectInfo&)info {
+    return [super initWithRealm:realm schema:info];
 }
 
 #pragma mark - Convenience Initializers
@@ -198,8 +198,7 @@
 
 @implementation RLMWeakObjectHandle {
     realm::Row _row;
-    RLMRealm *_realm;
-    RLMObjectSchema *_objectSchema;
+    RLMObjectInfo *_info;
     Class _objectClass;
 }
 
@@ -209,15 +208,14 @@
     }
 
     _row = object->_row;
-    _realm = object->_realm;
-    _objectSchema = object->_objectSchema;
+    _info = object->_info;
     _objectClass = object.class;
 
     return self;
 }
 
 - (RLMObjectBase *)object {
-    RLMObjectBase *object = [[_objectClass alloc] initWithRealm:_realm schema:_objectSchema];
+    RLMObjectBase *object = [[_objectClass alloc] initWithRealm:_info->realm schema:*_info];
     object->_row = std::move(_row);
     return object;
 }

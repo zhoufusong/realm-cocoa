@@ -17,20 +17,42 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealm_Private.h"
-#import "RLMUtil.hpp"
-#import "shared_realm.hpp"
 
-#import <realm/group.hpp>
+#import <unordered_map>
 
 namespace realm {
     class Group;
     class Realm;
-    typedef std::shared_ptr<realm::Realm> SharedRealm;
 }
+
+struct RLMObjectInfo;
+
+namespace std {
+template<> struct hash<NSString *> {
+    size_t operator()(__unsafe_unretained NSString *const str) const {
+        return [str hash];
+    }
+};
+}
+
+class RLMSchemaInfo {
+    using impl = std::unordered_map<NSString *, RLMObjectInfo>;
+public:
+    RLMObjectInfo *find(NSString *name) const noexcept;
+    RLMObjectInfo& operator[](NSString *name) const; // throws
+
+    impl::iterator begin();
+    impl::iterator end();
+    impl::const_iterator begin() const;
+    impl::const_iterator end() const;
+private:
+    std::unordered_map<NSString *, RLMObjectInfo> m_objects;
+};
 
 @interface RLMRealm () {
     @public
-    realm::SharedRealm _realm;
+    std::shared_ptr<realm::Realm> _realm;
+    RLMSchemaInfo _info;
 }
 
 // FIXME - group should not be exposed

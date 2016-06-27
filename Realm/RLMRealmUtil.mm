@@ -18,8 +18,9 @@
 
 #import "RLMRealmUtil.hpp"
 
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMObservation.hpp"
-#import "RLMRealm_Private.h"
+#import "RLMRealm_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import <Realm/RLMConstants.h>
@@ -119,7 +120,7 @@ public:
         @autoreleasepool {
             auto realm = _realm;
             [realm detachAllEnumerators];
-            return RLMGetObservedRows(realm.schema.objectSchema);
+            return RLMGetObservedRows(realm->_info);
         }
     }
 

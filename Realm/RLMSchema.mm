@@ -291,15 +291,6 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
     return schema;
 }
 
-- (instancetype)shallowCopy {
-    RLMSchema *schema = [[RLMSchema alloc] init];
-    schema->_objectSchemaByName = [[NSMutableDictionary alloc] initWithCapacity:_objectSchemaByName.count];
-    [_objectSchemaByName enumerateKeysAndObjectsUsingBlock:^(NSString *name, RLMObjectSchema *objectSchema, BOOL *) {
-        schema->_objectSchemaByName[name] = [objectSchema shallowCopy];
-    }];
-    return schema;
-}
-
 - (BOOL)isEqualToSchema:(RLMSchema *)schema {
     if (_objectSchemaByName.count != schema->_objectSchemaByName.count) {
         return NO;

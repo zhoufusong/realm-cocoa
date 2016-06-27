@@ -27,10 +27,13 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMResults_Private.h"
 #import "RLMSchema_Private.hpp"
+#import "RLMUtil.hpp"
 
 #import "object_store.hpp"
 #import "shared_realm.hpp"
 #import "schema.hpp"
+
+#import <realm/table.hpp>
 
 using namespace realm;
 
@@ -156,9 +159,6 @@ using namespace realm;
                                     withObject:objectSchema];
     objectSchema.realm = _realm;
     _realm.schema.objectSchema = [mutableObjectSchemas copy];
-    for (RLMProperty *property in objectSchema.properties) {
-        property.column = objectStoreSchema.property_for_name(property.name.UTF8String)->table_column;
-    }
 }
 
 @end

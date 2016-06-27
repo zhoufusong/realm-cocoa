@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-@class RLMRealm, RLMSchema, RLMObjectSchema, RLMObjectBase, RLMResults, RLMProperty;
+@class RLMRealm, RLMSchema, RLMObjectBase, RLMResults, RLMProperty;
 
 //
 // Accessor Creation
@@ -89,11 +89,11 @@ namespace realm {
     template<typename T> class BasicRowExpr;
     using RowExpr = BasicRowExpr<Table>;
 }
+struct RLMObjectInfo;
+
 // Create accessors
-RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm,
-                                       RLMObjectSchema *objectSchema,
+RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm, RLMObjectInfo& info,
                                        NSUInteger index) NS_RETURNS_RETAINED;
-RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm,
-                                       RLMObjectSchema *objectSchema,
+RLMObjectBase *RLMCreateObjectAccessor(RLMRealm *realm, RLMObjectInfo& info,
                                        realm::RowExpr row) NS_RETURNS_RETAINED;
 #endif
