@@ -76,6 +76,8 @@ public typealias SyncError = RLMSyncError
  */
 public typealias SyncLogLevel = RLMSyncLogLevel
 
+public typealias SyncManagementObjectStatus = RLMSyncManagementObjectStatus
+
 #if swift(>=3.0)
 
 /**
@@ -153,6 +155,17 @@ extension SyncUser {
                                    timeout: timeout,
                                    onCompletion: completion)
     }
+
+//    public func managementRealm() throws -> Realm {
+//        let components = NSURLComponents(url: authenticationServer!, resolvingAgainstBaseURL: false)!
+//        components.scheme = "realm"
+//        components.path = "/~/__management"
+//
+//        let managementRealmUrl = components.url!
+//
+//        let config = Realm.Configuration(syncConfiguration: (user: self, realmURL: managementRealmUrl), objectTypes: [PermissionOffer.self, PermissionChange.self, PermissionRequest.self])
+//        return try Realm(configuration: config)
+//    }
 }
 
 #else
@@ -235,6 +248,17 @@ extension SyncUser {
                                                  timeout: timeout,
                                                  onCompletion: completion)
     }
+
+//    public func managementRealm() throws -> Realm {
+//        let components = NSURLComponents(URL: authenticationServer!, resolvingAgainstBaseURL: false)!
+//        components.scheme = "realm"
+//        components.path = "/~/__management"
+//
+//        let managementRealmURL = components.URL!
+//
+//        let config = Realm.Configuration(syncConfiguration: (user: self, realmURL: managementRealmURL), objectTypes: [PermissionOffer.self, PermissionChange.self, PermissionRequest.self])
+//        return try Realm(configuration: config)
+//    }
 }
 
 #endif
