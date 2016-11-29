@@ -106,8 +106,7 @@
                                      
                                      UIView *drawView = [DrawView new];
                                      drawView.frame = self.window.rootViewController.view.bounds;
-                                     
-                                     [self.window.rootViewController.view addSubview:drawView];
+                                     self.window.rootViewController.view = drawView;
                                      self.controller = nil;
                                  });
                              }
