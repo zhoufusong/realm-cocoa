@@ -117,6 +117,11 @@
 		F18464671DC16CDA00DAB8B9 /* SwatchesView.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464621DC16CDA00DAB8B9 /* SwatchesView.m */; };
 		F184646A1DC16D3700DAB8B9 /* CanvasView.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464691DC16D3700DAB8B9 /* CanvasView.m */; };
 		F196C2EF1DD6442400AFB53B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
+		F1EC845C1DECFA1300794CDF /* RLMLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F1EC845B1DECFA1300794CDF /* RLMLoginViewController.m */; };
+		F1EC845F1DECFA4D00794CDF /* RLMLoginView.m in Sources */ = {isa = PBXBuildFile; fileRef = F1EC845E1DECFA4D00794CDF /* RLMLoginView.m */; };
+		F1EC84621DED00D600794CDF /* RLMRealmLogoView.m in Sources */ = {isa = PBXBuildFile; fileRef = F1EC84611DED00D600794CDF /* RLMRealmLogoView.m */; };
+		F1EC84651DED00EF00794CDF /* RLMLoginBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = F1EC84641DED00EF00794CDF /* RLMLoginBackgroundView.m */; };
+		F1EC84681DED0E8300794CDF /* RLMTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F1EC84671DED0E8300794CDF /* RLMTableViewCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -259,6 +264,16 @@
 		F18464681DC16D3700DAB8B9 /* CanvasView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CanvasView.h; sourceTree = "<group>"; };
 		F18464691DC16D3700DAB8B9 /* CanvasView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CanvasView.m; sourceTree = "<group>"; };
 		F18DC0A31DC2AFCB007D2D69 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		F1EC845A1DECFA1300794CDF /* RLMLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMLoginViewController.h; path = Controllers/RLMLoginViewController.h; sourceTree = "<group>"; };
+		F1EC845B1DECFA1300794CDF /* RLMLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMLoginViewController.m; path = Controllers/RLMLoginViewController.m; sourceTree = "<group>"; };
+		F1EC845D1DECFA4D00794CDF /* RLMLoginView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMLoginView.h; sourceTree = "<group>"; };
+		F1EC845E1DECFA4D00794CDF /* RLMLoginView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMLoginView.m; sourceTree = "<group>"; };
+		F1EC84601DED00D600794CDF /* RLMRealmLogoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealmLogoView.h; sourceTree = "<group>"; };
+		F1EC84611DED00D600794CDF /* RLMRealmLogoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMRealmLogoView.m; sourceTree = "<group>"; };
+		F1EC84631DED00EF00794CDF /* RLMLoginBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMLoginBackgroundView.h; sourceTree = "<group>"; };
+		F1EC84641DED00EF00794CDF /* RLMLoginBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMLoginBackgroundView.m; sourceTree = "<group>"; };
+		F1EC84661DED0E8300794CDF /* RLMTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTableViewCell.h; sourceTree = "<group>"; };
+		F1EC84671DED0E8300794CDF /* RLMTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTableViewCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -614,6 +629,7 @@
 		F184641E1DC151CD00DAB8B9 /* Draw */ = {
 			isa = PBXGroup;
 			children = (
+				F1EC84591DECF9EE00794CDF /* Controllers */,
 				F18464571DC16CD900DAB8B9 /* Models */,
 				F184645E1DC16CDA00DAB8B9 /* Views */,
 				F18464561DC1597C00DAB8B9 /* Draw.entitlements */,
@@ -643,6 +659,14 @@
 		F184645E1DC16CDA00DAB8B9 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F1EC84601DED00D600794CDF /* RLMRealmLogoView.h */,
+				F1EC84611DED00D600794CDF /* RLMRealmLogoView.m */,
+				F1EC84631DED00EF00794CDF /* RLMLoginBackgroundView.h */,
+				F1EC84641DED00EF00794CDF /* RLMLoginBackgroundView.m */,
+				F1EC84661DED0E8300794CDF /* RLMTableViewCell.h */,
+				F1EC84671DED0E8300794CDF /* RLMTableViewCell.m */,
+				F1EC845D1DECFA4D00794CDF /* RLMLoginView.h */,
+				F1EC845E1DECFA4D00794CDF /* RLMLoginView.m */,
 				F184645F1DC16CDA00DAB8B9 /* DrawView.h */,
 				F18464601DC16CDA00DAB8B9 /* DrawView.m */,
 				F18464611DC16CDA00DAB8B9 /* SwatchesView.h */,
@@ -651,6 +675,15 @@
 				F18464691DC16D3700DAB8B9 /* CanvasView.m */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		F1EC84591DECF9EE00794CDF /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				F1EC845A1DECFA1300794CDF /* RLMLoginViewController.h */,
+				F1EC845B1DECFA1300794CDF /* RLMLoginViewController.m */,
+			);
+			name = Controllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -876,11 +909,15 @@
 							};
 						};
 					};
+					E8AB71DB19BA503500F3EDB4 = {
+						DevelopmentTeam = 6LF3GMKZAB;
+					};
 					E8BDBFA01A116FAC00450CFF = {
 						CreatedOnToolsVersion = 6.1;
 					};
 					F184641C1DC151CD00DAB8B9 = {
 						CreatedOnToolsVersion = 8.1;
+						DevelopmentTeam = 6LF3GMKZAB;
 						LastSwiftMigration = 0810;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -1185,9 +1222,14 @@
 				F184644D1DC151F000DAB8B9 /* main.m in Sources */,
 				F18464631DC16CDA00DAB8B9 /* DrawPath.m in Sources */,
 				F18464661DC16CDA00DAB8B9 /* DrawView.m in Sources */,
+				F1EC84621DED00D600794CDF /* RLMRealmLogoView.m in Sources */,
 				F18464641DC16CDA00DAB8B9 /* DrawPoint.m in Sources */,
+				F1EC84681DED0E8300794CDF /* RLMTableViewCell.m in Sources */,
+				F1EC845C1DECFA1300794CDF /* RLMLoginViewController.m in Sources */,
+				F1EC845F1DECFA4D00794CDF /* RLMLoginView.m in Sources */,
 				F18464651DC16CDA00DAB8B9 /* SwatchColor.m in Sources */,
 				F184646A1DC16D3700DAB8B9 /* CanvasView.m in Sources */,
+				F1EC84651DED00EF00794CDF /* RLMLoginBackgroundView.m in Sources */,
 				F18464461DC151F000DAB8B9 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1461,6 +1503,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = 6LF3GMKZAB;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1479,6 +1522,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = 6LF3GMKZAB;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Simple/Simple-Info.plist";
@@ -1660,7 +1704,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CODE_SIGN_ENTITLEMENTS = Draw/Draw.entitlements;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 6LF3GMKZAB;
 				INFOPLIST_FILE = "$(SRCROOT)/Draw/Draw-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -1687,7 +1731,7 @@
 				CODE_SIGN_ENTITLEMENTS = Draw/Draw.entitlements;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 6LF3GMKZAB;
 				INFOPLIST_FILE = "$(SRCROOT)/Draw/Draw-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
