@@ -11,6 +11,10 @@
 #import "RLMLoginBackgroundView.h"
 #import "RLMTableViewCell.h"
 
+NSString * const kRLMHostNameKey = @"RLMHostNameKey";
+NSString * const kRLMUserNameKey = @"RLMUSerNameKey";
+NSString * const kRLMPasswordKey = @"RLMPasswordKey";
+
 @interface RLMLoginViewController () <UITextFieldDelegate>
 
 @property (nonatomic, assign) CGFloat keyboardHeight;
@@ -87,15 +91,20 @@
         return textField;
     };
     
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
     self.hostNameField = newTextFieldBlock();
     self.hostNameField.placeholder = @"localhost";
+    self.hostNameField.text = [defaults stringForKey:kRLMHostNameKey];
     
     self.passwordField = newTextFieldBlock();
     self.passwordField.placeholder = @"password";
     self.passwordField.secureTextEntry = YES;
+    self.passwordField.text = [defaults stringForKey:kRLMPasswordKey];
     
     self.userNameField = newTextFieldBlock();
     self.userNameField.placeholder = @"demo@realm.io";
+    self.userNameField.text = [defaults stringForKey:kRLMUserNameKey];
 }
 
 - (void)loadConnectButton
@@ -130,6 +139,13 @@
 
 - (void)buttonTapped:(id)sender
 {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    [defaults setObject:self.hostNameField.text forKey:kRLMHostNameKey];
+    [defaults setObject:self.userNameField.text forKey:kRLMUserNameKey];
+    [defaults setObject:self.passwordField.text forKey:kRLMPasswordKey];
+    [defaults synchronize];
+
     if (self.connectButtonTapped) {
         self.connectButtonTapped();
     }
