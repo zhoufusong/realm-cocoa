@@ -172,16 +172,28 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
                 case RLMSyncAuthErrorInvalidCredential:
                 case RLMSyncAuthErrorUserDoesNotExist:
                 case RLMSyncAuthErrorUserAlreadyExists:
-                    // Authentication error
-                    *error = responseError;
-                break;
-
+                case RLMSyncAuthErrorAccessDeniedOrInvalidPath:
+                case RLMSyncAuthErrorInvalidAccessToken:
+                case RLMSyncAuthErrorExpiredPermissionOffer:
+                case RLMSyncAuthErrorAmbiguousPermissionOffer:
+                case RLMSyncAuthErrorFileCannotBeShared: {
+                    NSString *description = responseError.userInfo[NSLocalizedDescriptionKey];
+                    NSString *hint = responseError.userInfo[NSLocalizedRecoverySuggestionErrorKey];
+                    *error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                 code:RLMSyncErrorAuthError
+                                             userInfo:@{
+                                                        kRLMSyncUnderlyingAuthErrorCodeKey: @(responseError.code),
+                                                        NSLocalizedDescriptionKey: description,
+                                                        NSLocalizedRecoverySuggestionErrorKey: hint
+                                                        }];
+                    break;
+                }
                 default:
                     // HTTP status error with some additional infor from the server
                     *error = [NSError errorWithDomain:RLMSyncErrorDomain
                                                  code:RLMSyncErrorHTTPStatusCodeError
                                              userInfo:responseError.userInfo];
-                break;
+                    break;
             }
         } else {
             // Fallback to HTTP status error without any additional info
@@ -189,7 +201,6 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
                                          code:RLMSyncErrorHTTPStatusCodeError
                                      userInfo:@{kRLMSyncErrorStatusCodeKey: @(httpResponse.statusCode)}];
         }
-
         return NO;
     }
 
@@ -218,12 +229,13 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     if (!responseModel) {
         return nil;
     }
-
-    NSMutableDictionary *mutableUserInfo = [NSMutableDictionary dictionaryWithObject:@(responseModel.status) forKey:kRLMSyncErrorStatusCodeKey];
-    [mutableUserInfo setValue:responseModel.title forKey:NSLocalizedDescriptionKey];
-    [mutableUserInfo setValue:responseModel.hint forKey:NSLocalizedRecoverySuggestionErrorKey];
-
-    return [NSError errorWithDomain:RLMSyncErrorDomain code:responseModel.code userInfo:mutableUserInfo];
+    return [NSError errorWithDomain:RLMSyncErrorDomain
+                               code:responseModel.code
+                           userInfo:@{
+                                      kRLMSyncErrorStatusCodeKey: @(responseModel.status),
+                                      NSLocalizedDescriptionKey: responseModel.title ?: @"(no description)",
+                                      NSLocalizedRecoverySuggestionErrorKey: responseModel.hint ?: @"(none)"
+                                      }];
 }
 
 @end

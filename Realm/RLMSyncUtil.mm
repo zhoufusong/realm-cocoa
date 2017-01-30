@@ -50,6 +50,7 @@ NSString *const RLMSyncErrorDomain = @"io.realm.sync";
 
 NSString *const kRLMSyncPathOfRealmBackupCopyKey            = @"recovered_realm_location_path";
 NSString *const kRLMSyncInitiateClientResetBlockKey         = @"initiate_client_reset_block";
+NSString *const kRLMSyncUnderlyingAuthErrorCodeKey          = @"underlying_auth_error_code";
 
 NSString *const kRLMSyncAppIDKey                = @"app_id";
 NSString *const kRLMSyncDataKey                 = @"data";

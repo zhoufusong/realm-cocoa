@@ -74,6 +74,13 @@ public typealias UserCompletionBlock = RLMUserCompletionBlock
 public typealias SyncError = RLMSyncError
 
 /**
+ A sub-error associated with authentication or permission issues.
+
+ - see: `SyncError`, `RLMSyncAuthError`
+ */
+public typealias SyncAuthError = RLMSyncAuthError
+
+/**
  An enum which can be used to specify the level of logging.
 
  - see: `RLMSyncLogLevel`
@@ -102,6 +109,16 @@ public extension SyncError {
             let recoveryPath = userInfo[kRLMSyncPathOfRealmBackupCopyKey] as? String,
             let block = _nsError.__rlmSync_clientResetBlock() {
             return (recoveryPath, block)
+        }
+        return nil
+    }
+
+    /// Given an auth error, return the underlying code and description.
+    public func authErrorInfo() -> (SyncAuthError.Code, String)? {
+        if code == SyncError.authError {
+            let code = SyncAuthError.Code(rawValue: userInfo[kRLMSyncUnderlyingAuthErrorCodeKey] as! Int)!
+            let description = userInfo[NSLocalizedDescriptionKey] as! String
+            return (code, description)
         }
         return nil
     }

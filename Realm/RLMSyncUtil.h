@@ -29,19 +29,46 @@ extern NSString *const kRLMSyncPathOfRealmBackupCopyKey;
 /// A user info key for use with `RLMSyncErrorClientResetError`.
 extern NSString *const kRLMSyncInitiateClientResetBlockKey;
 
+/**
+ A user info key for use with `RLMSyncErrorAuthError`.
+
+ The value associated with this key is the `RLMSyncAuthError` integer error code which describes the specific
+ authentication or permissions-related error situation.
+ */
+extern NSString *const kRLMSyncUnderlyingAuthErrorCodeKey;
+
 /// The error domain string for all SDK errors related to synchronization functionality.
 extern NSString *const RLMSyncErrorDomain;
 
 /// An error which is related to authentication to a Realm Object Server.
 typedef RLM_ERROR_ENUM(NSInteger, RLMSyncAuthError, RLMSyncErrorDomain) {
-    /// An error that indicates that the provided credentials are invalid.
-    RLMSyncAuthErrorInvalidCredential   = 611,
+    /**
+     An error that indicates that the provided credentials are invalid. This error may also
+     indicate an attempt to log in an existing user that does not actually exist, or to create
+     a new user when an existing user already has the given username.
+    */
+    RLMSyncAuthErrorInvalidCredential               = 611,
 
-    /// An error that indicates that the user with provided credentials does not exist.
-    RLMSyncAuthErrorUserDoesNotExist    = 612,
+    /// Do not use.
+    RLMSyncAuthErrorUserDoesNotExist                = 612,
 
-    /// An error that indicates that the user cannot be registered as it exists already.
-    RLMSyncAuthErrorUserAlreadyExists   = 613,
+    /// Do not use.
+    RLMSyncAuthErrorUserAlreadyExists               = 613,
+
+    /// An error that indicates the path is invalid or the user doesn't have access to the Realm there.
+    RLMSyncAuthErrorAccessDeniedOrInvalidPath       = 614,
+
+    /// An error that indicates the refresh token was invalid.
+    RLMSyncAuthErrorInvalidAccessToken              = 615,
+
+    /// An error that indicates the permission offer is expired.
+    RLMSyncAuthErrorExpiredPermissionOffer          = 701,
+
+    /// An error that indicates the permission offer is ambiguous.
+    RLMSyncAuthErrorAmbiguousPermissionOffer        = 702,
+
+    /// An error that indicates the file at the given path can't be shared.
+    RLMSyncAuthErrorFileCannotBeShared              = 703,
 };
 
 /// An error which is related to synchronization with a Realm Object Server.
@@ -101,6 +128,13 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      @see: `-[NSError rlmSync_clientResetBlock]`, `-[NSError rlmSync_clientResetBackedUpRealmPath]`
      */
     RLMSyncErrorClientResetError        = 7,
+
+    /**
+     An error that indicates an issue with the permissions for a given user or Realm.
+
+     @see: `RLMSyncAuthError`
+     */
+    RLMSyncErrorAuthError               = 8,
 };
 
 /// An enum representing the different states a sync management object can take.

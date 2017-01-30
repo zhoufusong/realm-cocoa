@@ -71,14 +71,14 @@
     [RLMSyncUser logInWithCredentials:credentials
                         authServerURL:[RLMObjectServerTests authServerURL]
                          onCompletion:^(RLMSyncUser *user, NSError *error) {
-        XCTAssertNil(user);
-        XCTAssertNotNil(error);
-        XCTAssertEqual(error.domain, RLMSyncErrorDomain);
-        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
-        XCTAssertNotNil(error.localizedDescription);
-
-        [expectation fulfill];
-    }];
+                             XCTAssertNil(user);
+                             XCTAssertNotNil(error);
+                             XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+                             XCTAssertEqual(error.code, RLMSyncErrorAuthError);
+                             NSInteger code = [error.userInfo[kRLMSyncUnderlyingAuthErrorCodeKey] integerValue];
+                             XCTAssertEqual(code, RLMSyncAuthErrorInvalidCredential);
+                             [expectation fulfill];
+                         }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
@@ -91,14 +91,15 @@
     [RLMSyncUser logInWithCredentials:credentials
                         authServerURL:[RLMObjectServerTests authServerURL]
                          onCompletion:^(RLMSyncUser *user, NSError *error) {
-        XCTAssertNil(user);
-        XCTAssertNotNil(error);
-        XCTAssertEqual(error.domain, RLMSyncErrorDomain);
-        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
-        XCTAssertNotNil(error.localizedDescription);
-
-        [expectation fulfill];
-    }];
+                             XCTAssertNil(user);
+                             XCTAssertNotNil(error);
+                             XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+                             XCTAssertEqual(error.code, RLMSyncErrorAuthError);
+                             NSInteger code = [error.userInfo[kRLMSyncUnderlyingAuthErrorCodeKey] integerValue];
+                             XCTAssertEqual(code, RLMSyncAuthErrorInvalidCredential);
+                             XCTAssertNotNil(error.localizedDescription);
+                             [expectation fulfill];
+                         }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
@@ -112,15 +113,16 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
     [RLMSyncUser logInWithCredentials:credentials
                         authServerURL:[RLMObjectServerTests authServerURL]
-                        onCompletion:^(RLMSyncUser *user, NSError *error) {
-        XCTAssertNil(user);
-        XCTAssertNotNil(error);
-        XCTAssertEqual(error.domain, RLMSyncErrorDomain);
-        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
-        XCTAssertNotNil(error.localizedDescription);
-
-        [expectation fulfill];
-    }];
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
+                             XCTAssertNil(user);
+                             XCTAssertNotNil(error);
+                             XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+                             XCTAssertEqual(error.code, RLMSyncErrorAuthError);
+                             NSInteger code = [error.userInfo[kRLMSyncUnderlyingAuthErrorCodeKey] integerValue];
+                             XCTAssertEqual(code, RLMSyncAuthErrorInvalidCredential);
+                             XCTAssertNotNil(error.localizedDescription);
+                             [expectation fulfill];
+                         }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 

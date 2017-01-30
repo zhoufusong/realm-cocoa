@@ -217,6 +217,31 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    // MARK: Auth
+
+    func testInvalidCredentials() {
+        do {
+            let username = "testInvalidCredentialsUsername"
+            let credentials = SyncCredentials.usernamePassword(username: username,
+                                                               password: "THIS_IS_A_PASSWORD",
+                                                               register: true)
+            _ = try synchronouslyLogInUser(for: credentials, server: authURL)
+            // Now log in the same user, but with a bad password.
+            let ex = expectation(description: "wait for user login")
+            let credentials2 = SyncCredentials.usernamePassword(username: username, password: "NOT_A_VALID_PASSWORD")
+            SyncUser.logIn(with: credentials2, server: authURL) { user, error in
+                XCTAssertNil(user)
+                XCTAssertNotNil(error as? SyncError)
+                let (code, _) = (error as! SyncError).authErrorInfo()!
+                XCTAssertEqual(code, SyncAuthError.invalidCredential)
+                ex.fulfill()
+            }
+            waitForExpectations(timeout: 2.0, handler: nil)
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
     // MARK: Permissions
 
     func testPermissionChange() {
