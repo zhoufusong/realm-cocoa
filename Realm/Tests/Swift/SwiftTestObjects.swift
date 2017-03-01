@@ -59,6 +59,19 @@ class SwiftOptionalObject: RLMObject {
     dynamic var optObjectCol: SwiftBoolObject?
 }
 
+class SwiftOptionalObjectWithPrimaryKey: RLMObject {
+    dynamic var pk: String = ""
+    dynamic var optStringCol: String?
+    dynamic var optNSStringCol: NSString?
+    dynamic var optBinaryCol: Data?
+    dynamic var optDateCol: Date?
+    dynamic var optObjectCol: SwiftBoolObject?
+
+    override class func primaryKey() -> String {
+        return "pk"
+    }
+}
+
 class SwiftDogObject: RLMObject {
     dynamic var dogName = ""
 }

@@ -271,6 +271,32 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         try! realm.commitWriteTransaction()
     }
 
+    func testCreateOrUpdateWithOptionalProperties() {
+        let realm = RLMRealm.default()
+        let pk = "primary_key"
+
+        try! realm.transaction() { _ in
+            let newObject = SwiftOptionalObjectWithPrimaryKey()
+            newObject.pk = pk
+            newObject.optStringCol = "2"
+            SwiftOptionalObjectWithPrimaryKey.createOrUpdateInDefaultRealm(withValue: newObject)
+        }
+        var object = realm.object(withClassName: SwiftOptionalObjectWithPrimaryKey.className(), forPrimaryKey: pk) as! SwiftOptionalObjectWithPrimaryKey
+        XCTAssertNotNil(object)
+        XCTAssertEqual(object.optStringCol, "2")
+
+        // Nil out the string property
+        try! realm.transaction() { _ in
+            let updatedObject = SwiftOptionalObjectWithPrimaryKey()
+            updatedObject.pk = pk
+            updatedObject.optStringCol = nil
+            SwiftOptionalObjectWithPrimaryKey.createOrUpdateInDefaultRealm(withValue: updatedObject)
+        }
+        object = realm.object(withClassName: SwiftOptionalObjectWithPrimaryKey.className(), forPrimaryKey: pk) as! SwiftOptionalObjectWithPrimaryKey
+        XCTAssertNotNil(object)
+        XCTAssertNil(object.optStringCol)
+    }
+    
     // if this fails (and you haven't changed the test module name), the checks
     // for swift class names and the demangling logic need to be updated
     func testNSStringFromClassDemangledTopLevelClassNames() {
