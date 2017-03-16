@@ -59,6 +59,9 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSNumber<RLMFloat> *optFloatCol;
 @property NSNumber<RLMDouble> *optDoubleCol;
 @property NSNumber<RLMBool> *optBoolCol;
+
+@property RLMInteger *realmIntCol;
+@property RLMNullableInteger *realmNullableIntCol;
 @end
 @implementation KVOObject
 + (NSString *)primaryKey {
@@ -111,6 +114,9 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSNumber<RLMFloat> *optFloatCol;
 @property NSNumber<RLMDouble> *optDoubleCol;
 @property NSNumber<RLMBool> *optBoolCol;
+
+@property RLMInteger *realmIntCol;
+@property RLMNullableInteger *realmNullableIntCol;
 @end
 @implementation PlainKVOObject
 @end
@@ -323,6 +329,8 @@ public:
     obj.stringCol = @"";
     obj.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:0];
     obj.arrayCol = [NSMutableArray array];
+    obj.realmIntCol = [[RLMInteger alloc] initWithValue:10];
+    obj.realmNullableIntCol = [[RLMNullableInteger alloc] initWithValue:@10];
     return obj;
 }
 
@@ -580,6 +588,42 @@ public:
     }
 }
 
+- (void)checkRealmIntegerTypesWithObject:(KVOObject *)obj {
+    {
+        KVORecorder r(self, obj, @"realmIntCol.value");
+        obj.realmIntCol.value = 100;
+        AssertChanged(r, @10, @100);
+        [obj.realmIntCol incrementValueBy:1];
+        AssertChanged(r, @100, @101);
+    }
+    
+    {
+        KVORecorder r(self, obj, @"realmNullableIntCol.value");
+        obj.realmNullableIntCol.value = @101;
+        AssertChanged(r, @10, @101);
+        [obj.realmNullableIntCol incrementValueBy:1];
+        AssertChanged(r, @101, @102);
+        obj.realmNullableIntCol.value = nil;
+        AssertChanged(r, @102, NSNull.null);
+    }
+}
+
+- (void)checkRealmIntegerTypesKVCWithObject:(KVOObject *)obj {
+    {
+        KVORecorder r(self, obj, @"realmIntCol.value");
+        [obj setValue:[[RLMInteger alloc] initWithValue:20] forKey:@"realmIntCol"];
+        AssertChanged(r, @10, @20);
+    }
+
+    {
+        KVORecorder r(self, obj, @"realmNullableIntCol.value");
+        [obj setValue:[[RLMNullableInteger alloc] initWithValue:@21] forKey:@"realmNullableIntCol"];
+        AssertChanged(r, @10, @21);
+        [obj setValue:nil forKey:@"realmNullableIntCol"];
+        AssertChanged(r, @21, NSNull.null);
+    }
+}
+
 - (void)testAllPropertyTypes {
     KVOObject *obj = [self createObject];
 
@@ -697,6 +741,8 @@ public:
         obj.optBoolCol = nil;
         AssertChanged(r, @YES, NSNull.null);
     }
+
+    [self checkRealmIntegerTypesWithObject:obj];
 }
 
 - (void)testAllPropertyTypesKVC {
@@ -816,6 +862,8 @@ public:
         [obj setValue:nil forKey:@"optBoolCol"];
         AssertChanged(r, @YES, NSNull.null);
     }
+
+    [self checkRealmIntegerTypesKVCWithObject:obj];
 }
 
 - (void)testAllPropertyTypesDynamic {
@@ -937,6 +985,20 @@ public:
         AssertChanged(r, NSNull.null, @YES);
         obj[@"optBoolCol"] = nil;
         AssertChanged(r, @YES, NSNull.null);
+    }
+
+    {
+        KVORecorder r(self, obj, @"realmIntCol");
+        obj[@"realmIntCol"] = @30;
+        AssertChanged(r, @10, @30);
+    }
+
+    {
+        KVORecorder r(self, obj, @"realmNullableIntCol");
+        obj[@"realmNullableIntCol"] = @31;
+        AssertChanged(r, @10, @31);
+        obj[@"realmNullableIntCol"] = nil;
+        AssertChanged(r, @31, NSNull.null);
     }
 }
 
@@ -1073,6 +1135,8 @@ public:
     obj.binaryCol = NSData.data;
     obj.stringCol = @"";
     obj.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:0];
+    obj.realmIntCol = [[RLMInteger alloc] initWithValue:10];
+    obj.realmNullableIntCol = [[RLMNullableInteger alloc] initWithValue:@10];
     return obj;
 }
 
@@ -1085,6 +1149,46 @@ public:
     obj2.pk = pk++;
     obj2.obj = obj1;
     return obj2;
+}
+
+- (void)checkRealmIntegerTypesWithObject:(KVOObject *)obj {
+    {
+        KVORecorder r(self, obj, @"realmIntCol");
+        obj.realmIntCol.value = 100;
+        AssertChanged(r, @10, @100);
+        [obj.realmIntCol incrementValueBy:1];
+        AssertChanged(r, @100, @101);
+    }
+    
+    {
+        KVORecorder r(self, obj, @"realmNullableIntCol");
+        obj.realmNullableIntCol.value = @101;
+        AssertChanged(r, @10, @101);
+        [obj.realmNullableIntCol incrementValueBy:1];
+        AssertChanged(r, @101, @102);
+        obj.realmNullableIntCol.value = nil;
+        AssertChanged(r, @102, NSNull.null);
+    }
+}
+
+- (void)checkRealmIntegerTypesKVCWithObject:(KVOObject *)obj {
+    {
+        KVORecorder r(self, obj, @"realmIntCol");
+        [obj setValue:@20 forKey:@"realmIntCol"];
+        AssertChanged(r, @10, @20);
+    }
+
+    {
+        KVORecorder r(self, obj, @"realmNullableIntCol");
+        [obj setValue:@21 forKey:@"realmNullableIntCol"];
+        AssertChanged(r, @10, @21);
+        [obj setValue:nil forKey:@"realmNullableIntCol"];
+        AssertChanged(r, @21, NSNull.null);
+    }
+}
+
+- (void)testAllPropertyTypes {
+    [super testAllPropertyTypes];
 }
 
 - (void)testAddToRealmAfterAddingObservers {
@@ -1150,12 +1254,49 @@ public:
                                                        @NO, @1, @2, @3, @0, @0, @NO, @"",
                                                        NSData.data, [NSDate dateWithTimeIntervalSinceReferenceDate:0],
                                                        NSNull.null, NSNull.null,
-                                                       NSNull.null, NSNull.null, NSNull.null, NSNull.null]];
+                                                       NSNull.null, NSNull.null, NSNull.null, NSNull.null,
+                                                       @10, @10]];
 }
 
 - (id)createLinkObject {
     static std::atomic<int> pk{0};
     return [KVOLinkObject2 createInRealm:_realm withValue:@[@(++pk), @[@(++pk), [self createObject], @[]], @[]]];
+}
+
+- (void)checkRealmIntegerTypesWithObject:(KVOObject *)obj {
+    {
+        KVORecorder r(self, obj, @"realmIntCol");
+        obj.realmIntCol.value = 100;
+        AssertChanged(r, @10, @100);
+        [obj.realmIntCol incrementValueBy:1];
+        AssertChanged(r, @100, @101);
+    }
+    
+    {
+        KVORecorder r(self, obj, @"realmNullableIntCol");
+        obj.realmNullableIntCol.value = @101;
+        AssertChanged(r, @10, @101);
+        [obj.realmNullableIntCol incrementValueBy:1];
+        AssertChanged(r, @101, @102);
+        obj.realmNullableIntCol.value = nil;
+        AssertChanged(r, @102, NSNull.null);
+    }
+}
+
+- (void)checkRealmIntegerTypesKVCWithObject:(KVOObject *)obj {
+    {
+        KVORecorder r(self, obj, @"realmIntCol");
+        [obj setValue:@20 forKey:@"realmIntCol"];
+        AssertChanged(r, @10, @20);
+    }
+
+    {
+        KVORecorder r(self, obj, @"realmNullableIntCol");
+        [obj setValue:@21 forKey:@"realmNullableIntCol"];
+        AssertChanged(r, @10, @21);
+        [obj setValue:nil forKey:@"realmNullableIntCol"];
+        AssertChanged(r, @21, NSNull.null);
+    }
 }
 
 - (void)testDeleteObservedObject {

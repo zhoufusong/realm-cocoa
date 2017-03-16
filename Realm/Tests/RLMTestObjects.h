@@ -41,6 +41,14 @@
 
 @end
 
+@interface RealmIntObject : RLMObject
+@property RLMInteger *realmInt;
+@end
+
+@interface RealmNullableIntObject : RLMObject
+@property RLMNullableInteger *realmInt;
+@end
+
 @interface AllIntSizesObject : RLMObject
 // int8_t not supported due to being ambiguous with BOOL
 
@@ -125,6 +133,8 @@ RLM_ARRAY_TYPE(IntObject)
 @property int64_t     longCol;
 @property StringObject *objectCol;
 @property (readonly) RLMLinkingObjects *linkingObjectsCol;
+@property RLMInteger *realmIntCol;
+@property RLMNullableInteger *realmNullableIntCol;
 
 @end
 
@@ -146,6 +156,7 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property NSString *string;
 @property NSData *data;
 @property NSDate *date;
+// TODO: add RLMNullableInteger here?
 @end
 
 @interface AllOptionalTypesPK : RLMObject

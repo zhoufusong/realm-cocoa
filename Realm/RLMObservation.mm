@@ -20,6 +20,7 @@
 
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
+#import "RLMInteger_Private.hpp"
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.hpp"
@@ -186,6 +187,14 @@ void RLMObservationInfo::recordObserver(realm::Row& objectRow, RLMClassInfo *obj
         RLMArray *array = [value isKindOfClass:[RLMListBase class]] ? [value _rlmArray] : value;
         array->_key = key;
         array->_parentObject = object;
+    } else if (prop && prop.subtype == RLMPropertySubtypeInteger) {
+        auto rlmInt = static_cast<RLMInteger *>(valueForKey(key, false));
+        rlmInt->_object = object;
+        rlmInt->_name = prop.name;
+    } else if (prop && prop.subtype == RLMPropertySubtypeNullableInteger) {
+        auto rlmNullableInt = static_cast<RLMNullableInteger *>(valueForKey(key, false));
+        rlmNullableInt->_object = object;
+        rlmNullableInt->_name = prop.name;
     }
     else if (auto swiftIvar = prop.swiftIvar) {
         if (auto optional = RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, swiftIvar))) {
@@ -199,7 +208,7 @@ void RLMObservationInfo::removeObserver() {
     --observerCount;
 }
 
-id RLMObservationInfo::valueForKey(NSString *key) {
+id RLMObservationInfo::valueForKey(NSString *key, bool condenseRealmInts) {
     if (invalidated) {
         if ([key isEqualToString:RLMInvalidatedKey]) {
             return @YES;
@@ -215,7 +224,11 @@ id RLMObservationInfo::valueForKey(NSString *key) {
     static auto superValueForKey = reinterpret_cast<id(*)(id, SEL, NSString *)>([NSObject methodForSelector:@selector(valueForKey:)]);
     if (!lastProp) {
         // Not a managed property, so use NSObject's implementation of valueForKey:
-        return RLMCoerceToNil(superValueForKey(object, @selector(valueForKey:), key));
+        id value = RLMCoerceToNil(superValueForKey(object, @selector(valueForKey:), key));
+        if (condenseRealmInts && [value conformsToProtocol:@protocol(RLMIntegerProtocol)]) {
+            return [value boxedValue];
+        }
+        return value;
     }
 
     auto getSuper = [&] {
