@@ -100,6 +100,8 @@
 		1A33C4311DAEE445001E87AA /* RLMSyncSessionRefreshHandle.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A33C42D1DAEE445001E87AA /* RLMSyncSessionRefreshHandle.mm */; };
 		1A3623681D8384BA00945A54 /* RLMSyncConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A3623661D8384BA00945A54 /* RLMSyncConfiguration.mm */; };
 		1A4FFC991D35A71000B4B65C /* RLMSyncUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A4FFC971D35A71000B4B65C /* RLMSyncUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A552E681EBA401200698F33 /* RLMReachability.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A552E661EBA401200698F33 /* RLMReachability.mm */; };
+		1A552E691EBA401E00698F33 /* RLMReachability.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A552E661EBA401200698F33 /* RLMReachability.mm */; };
 		1A5CBA481E71DDFD007A95C2 /* binding_callback_thread_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A5CBA461E71DDFD007A95C2 /* binding_callback_thread_observer.cpp */; };
 		1A5CBA4A1E71DE17007A95C2 /* binding_callback_thread_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A5CBA461E71DDFD007A95C2 /* binding_callback_thread_observer.cpp */; };
 		1A64CA8B1D8763B400BC0F9B /* keychain_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A64CA891D8763B400BC0F9B /* keychain_helper.cpp */; };
@@ -654,6 +656,8 @@
 		1A36236A1D83868F00945A54 /* RLMSyncConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMSyncConfiguration_Private.h; sourceTree = "<group>"; };
 		1A4AC06D1D8BA86200DC9736 /* RLMSyncConfiguration_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSyncConfiguration_Private.hpp; sourceTree = "<group>"; };
 		1A4FFC971D35A71000B4B65C /* RLMSyncUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncUtil.h; sourceTree = "<group>"; };
+		1A552E651EBA401200698F33 /* RLMReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMReachability.h; sourceTree = "<group>"; };
+		1A552E661EBA401200698F33 /* RLMReachability.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMReachability.mm; sourceTree = "<group>"; };
 		1A5CBA461E71DDFD007A95C2 /* binding_callback_thread_observer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = binding_callback_thread_observer.cpp; sourceTree = "<group>"; };
 		1A5CBA471E71DDFD007A95C2 /* binding_callback_thread_observer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = binding_callback_thread_observer.hpp; sourceTree = "<group>"; };
 		1A64CA891D8763B400BC0F9B /* keychain_helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = keychain_helper.cpp; sourceTree = "<group>"; };
@@ -1106,6 +1110,8 @@
 				1AF6EA461D36B1850014EB85 /* RLMAuthResponseModel.m */,
 				1AF7EA991D340E700001A9B5 /* RLMNetworkClient.h */,
 				1AF7EA9A1D340E700001A9B5 /* RLMNetworkClient.mm */,
+				1A552E651EBA401200698F33 /* RLMReachability.h */,
+				1A552E661EBA401200698F33 /* RLMReachability.mm */,
 				C2841D5A1DDC673300943503 /* RLMSyncErrorResponseModel.h */,
 				C2841D5B1DDC673300943503 /* RLMSyncErrorResponseModel.m */,
 				1A33C42C1DAEE445001E87AA /* RLMSyncSessionRefreshHandle.hpp */,
@@ -2260,6 +2266,7 @@
 				1AF7EA9C1D340E700001A9B5 /* RLMNetworkClient.mm in Sources */,
 				5D659E8C1BE04556006515A0 /* RLMObject.mm in Sources */,
 				5D659E8D1BE04556006515A0 /* RLMObjectBase.mm in Sources */,
+				1A552E681EBA401200698F33 /* RLMReachability.mm in Sources */,
 				5D659E8E1BE04556006515A0 /* RLMObjectSchema.mm in Sources */,
 				1AD6E7A11E8C217000D4C8B4 /* RLMSyncPermissionResults.mm in Sources */,
 				5D659E8F1BE04556006515A0 /* RLMObjectStore.mm in Sources */,
@@ -2401,6 +2408,7 @@
 				1A90FCBC1D3D37F70086A57F /* RLMNetworkClient.mm in Sources */,
 				5DD7558A1BE056DE002800DA /* RLMObject.mm in Sources */,
 				5DD7558B1BE056DE002800DA /* RLMObjectBase.mm in Sources */,
+				1A552E691EBA401E00698F33 /* RLMReachability.mm in Sources */,
 				5DD7558C1BE056DE002800DA /* RLMObjectSchema.mm in Sources */,
 				1AD6E7A31E8C218F00D4C8B4 /* RLMSyncPermissionResults.mm in Sources */,
 				5DD7558D1BE056DE002800DA /* RLMObjectStore.mm in Sources */,
