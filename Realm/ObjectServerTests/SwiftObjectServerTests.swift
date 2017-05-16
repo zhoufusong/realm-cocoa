@@ -280,7 +280,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     // MARK: Permissions
-
+/*
     func testPermissionChange() {
         do {
             let userA = try synchronouslyLogInUser(for: basicCredentials(register: isParent, usernameSuffix: "_A"), server: authURL)
@@ -322,7 +322,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
-    }
+    }*/
 
     func verifyChangePermission(change: SyncPermissionChange, statusMessage: String, owner: SyncUser) throws {
         let managementRealm = try owner.managementRealm()
@@ -344,7 +344,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 2)
         token.stop()
     }
-
+/*
     func testPermissionOffer() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
@@ -445,5 +445,5 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
-    }
+    } */
 }

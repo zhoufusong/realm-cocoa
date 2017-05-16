@@ -1244,7 +1244,7 @@
 
     [token stop];
 }
-
+/*
 /// Grant/revoke access a user's Realm to another user. Another user has no access permission by default.
 - (void)testPermissionChange {
     NSString *userNameA = [NSStringFromSelector(_cmd) stringByAppendingString:@"_A"];
@@ -1768,7 +1768,7 @@
 
     [token stop];
 }
-
+*/
 #pragma mark - Validation
 
 - (void)testCompactOnLaunchCannotBeSet {

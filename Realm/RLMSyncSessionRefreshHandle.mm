@@ -133,6 +133,11 @@ using namespace realm;
         session->refresh_access_token([model.accessToken.token UTF8String], {resolvedURLString.UTF8String});
         success = session->state() != SyncSession::PublicState::Error;
         if (success) {
+            // Cancel any pending reconnection delay.
+            // This is necessary if the refresh handle's refresh was triggered by a 202 error
+            // (token expired). Otherwise the sync client's backoff delay will cause the reconnect
+            // attempt to be delayed by a few seconds.
+            SyncManager::shared().cancel_reconnect_delay();
             // Schedule a refresh. If we're successful we must already have `bind()`ed the session
             // initially, so we can null out the strong pointer.
             _strongSession = nullptr;
@@ -166,7 +171,7 @@ using namespace realm;
     [[RLMSyncManager sharedManager] _fireError:make_sync_error(authError)];
     // Certain errors related to network connectivity should trigger a retry.
     NSDate *nextTryDate = nil;
-    if (error.domain == NSURLErrorDomain) {
+    if ([error.domain isEqualToString:NSURLErrorDomain]) {
         switch (error.code) {
             case NSURLErrorCannotConnectToHost:
             case NSURLErrorNotConnectedToInternet:
