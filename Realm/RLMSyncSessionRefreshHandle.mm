@@ -133,11 +133,6 @@ using namespace realm;
         session->refresh_access_token([model.accessToken.token UTF8String], {resolvedURLString.UTF8String});
         success = session->state() != SyncSession::PublicState::Error;
         if (success) {
-            // Cancel any pending reconnection delay.
-            // This is necessary if the refresh handle's refresh was triggered by a 202 error
-            // (token expired). Otherwise the sync client's backoff delay will cause the reconnect
-            // attempt to be delayed by a few seconds.
-            SyncManager::shared().cancel_reconnect_delay();
             // Schedule a refresh. If we're successful we must already have `bind()`ed the session
             // initially, so we can null out the strong pointer.
             _strongSession = nullptr;
