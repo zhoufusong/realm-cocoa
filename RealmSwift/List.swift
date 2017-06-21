@@ -51,7 +51,7 @@ public class ListBase: RLMListBase {
 
  Properties of `List` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
  */
-public final class List<T: Object>: ListBase {
+public final class List<T: RealmCollectionValue>: ListBase {
 
     /// The type of the elements contained within the collection.
     public typealias Element = T
@@ -70,10 +70,10 @@ public final class List<T: Object>: ListBase {
 
     /// Creates a `List` that holds Realm model objects of type `T`.
     public override init() {
-        super.init(array: RLMArray(objectClassName: (T.self as Object.Type).className()))
+        super.init(array: T._rlmArray())
     }
 
-    internal init(rlmArray: RLMArray<RLMObject>) {
+    internal init(rlmArray: RLMArray<AnyObject>) {
         super.init(array: rlmArray)
     }
 
@@ -85,7 +85,7 @@ public final class List<T: Object>: ListBase {
      - parameter object: An object to find.
      */
     public func index(of object: T) -> Int? {
-        return notFoundToNil(index: _rlmArray.index(of: object.unsafeCastToRLMObject()))
+        return notFoundToNil(index: _rlmArray.index(of: object as AnyObject))
     }
 
     /**
@@ -106,6 +106,13 @@ public final class List<T: Object>: ListBase {
         return index(matching: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
+    private func cast<U, V>(_ value: U, to: V.Type) -> V {
+        if let v = value as? V {
+            return v
+        }
+        return unsafeBitCast(value, to: to)
+    }
+
     // MARK: Object Retrieval
 
     /**
@@ -118,26 +125,26 @@ public final class List<T: Object>: ListBase {
     public subscript(position: Int) -> T {
         get {
             throwForNegativeIndex(position)
-            return unsafeBitCast(_rlmArray.object(at: UInt(position)), to: T.self)
+            return cast(_rlmArray.object(at: UInt(position)), to: T.self)
         }
         set {
             throwForNegativeIndex(position)
-            _rlmArray.replaceObject(at: UInt(position), with: newValue.unsafeCastToRLMObject())
+            _rlmArray.replaceObject(at: UInt(position), with: newValue as AnyObject)
         }
     }
 
     /// Returns the first object in the list, or `nil` if the list is empty.
-    public var first: T? { return unsafeBitCast(_rlmArray.firstObject(), to: Optional<T>.self) }
+    public var first: T? { return cast(_rlmArray.firstObject(), to: Optional<T>.self) }
 
     /// Returns the last object in the list, or `nil` if the list is empty.
-    public var last: T? { return unsafeBitCast(_rlmArray.lastObject(), to: Optional<T>.self) }
+    public var last: T? { return cast(_rlmArray.lastObject(), to: Optional<T>.self) }
 
     // MARK: KVC
 
     /**
      Returns an `Array` containing the results of invoking `valueForKey(_:)` using `key` on each of the collection's
      objects.
-    */
+     */
     public override func value(forKey key: String) -> Any? {
         return value(forKeyPath: key)
     }
@@ -294,7 +301,7 @@ public final class List<T: Object>: ListBase {
      - parameter object: An object.
      */
     public func append(_ object: T) {
-        _rlmArray.add(object.unsafeCastToRLMObject())
+        _rlmArray.add(object as AnyObject)
     }
 
     /**
@@ -304,7 +311,7 @@ public final class List<T: Object>: ListBase {
     */
     public func append<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == T {
         for obj in objects {
-            _rlmArray.add(obj.unsafeCastToRLMObject())
+            _rlmArray.add(obj as AnyObject)
         }
     }
 
@@ -320,7 +327,7 @@ public final class List<T: Object>: ListBase {
      */
     public func insert(_ object: T, at index: Int) {
         throwForNegativeIndex(index)
-        _rlmArray.insert(object.unsafeCastToRLMObject(), at: UInt(index))
+        _rlmArray.insert(object as AnyObject, at: UInt(index))
     }
 
     /**
@@ -367,7 +374,7 @@ public final class List<T: Object>: ListBase {
      */
     public func replace(index: Int, object: T) {
         throwForNegativeIndex(index)
-        _rlmArray.replaceObject(at: UInt(index), with: object.unsafeCastToRLMObject())
+        _rlmArray.replaceObject(at: UInt(index), with: object as AnyObject)
     }
 
     /**
@@ -534,7 +541,7 @@ extension List: RealmCollection, RangeReplaceableCollection {
 
 extension List: AssistedObjectiveCBridgeable {
     internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> List {
-        guard let objectiveCValue = objectiveCValue as? RLMArray<RLMObject> else { preconditionFailure() }
+        guard let objectiveCValue = objectiveCValue as? RLMArray<AnyObject> else { preconditionFailure() }
         return List(rlmArray: objectiveCValue)
     }
 
@@ -545,7 +552,7 @@ extension List: AssistedObjectiveCBridgeable {
 
 // MARK: Unavailable
 
-extension List {
+extension List where T: Object {
     @available(*, unavailable, renamed: "append(objectsIn:)")
     public func appendContentsOf<S: Sequence>(_ objects: S) where S.Iterator.Element == T { fatalError() }
 
