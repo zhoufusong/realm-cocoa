@@ -192,12 +192,12 @@ class ListTests: TestCase {
 
         array.append(objectsIn: [str1, str2, str1])
 
-        array.remove(objectAtIndex: 1)
+        array.remove(at: 1)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str1, array[1])
 
-        assertThrows(array.remove(objectAtIndex: 200))
-        assertThrows(array.remove(objectAtIndex: -200))
+        assertThrows(array.remove(at: 2))
+        assertThrows(array.remove(at: -2))
     }
 
     func testRemoveLast() {

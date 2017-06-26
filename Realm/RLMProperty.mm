@@ -518,6 +518,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
 
     _name = name;
     _type = RLMPropertyTypeLinkingObjects;
+    _array = true;
     _objectClassName = objectClassName;
     _linkOriginPropertyName = linkOriginPropertyName;
     _swiftIvar = ivar;

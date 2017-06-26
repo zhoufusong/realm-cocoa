@@ -247,7 +247,7 @@ id makeNumberGetter(NSUInteger index, bool boxed, bool optional) {
 // dynamic getter with column closure
 id managedGetter(RLMProperty *prop, const char *type) {
     NSUInteger index = prop.index;
-    if (prop.array) {
+    if (prop.array && prop.type != RLMPropertyTypeLinkingObjects) {
         return ^id(__unsafe_unretained RLMObjectBase *const obj) {
             return getArray(obj, index);
         };
@@ -373,6 +373,9 @@ void superSet(RLMObjectBase *obj, NSString *propName, id val) {
 // getter/setter for unmanaged object
 id unmanagedGetter(RLMProperty *prop, const char *) {
     // only override getters for RLMArray and linking objects properties
+    if (prop.type == RLMPropertyTypeLinkingObjects) {
+        return ^(RLMObjectBase *) { return [RLMResults emptyDetachedResults]; };
+    }
     if (prop.array) {
         NSString *propName = prop.name;
         if (prop.type == RLMPropertyTypeObject) {
@@ -386,21 +389,16 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
                 return val;
             };
         }
-        else {
-            auto type = prop.type;
-            auto optional = prop.optional;
-            return ^(RLMObjectBase *obj) {
-                id val = superGet(obj, propName);
-                if (!val) {
-                    val = [[RLMArray alloc] initWithObjectType:type optional:optional];
-                    superSet(obj, propName, val);
-                }
-                return val;
-            };
-        }
-    }
-    if (prop.type == RLMPropertyTypeLinkingObjects) {
-        return ^(RLMObjectBase *) { return [RLMResults emptyDetachedResults]; };
+        auto type = prop.type;
+        auto optional = prop.optional;
+        return ^(RLMObjectBase *obj) {
+            id val = superGet(obj, propName);
+            if (!val) {
+                val = [[RLMArray alloc] initWithObjectType:type optional:optional];
+                superSet(obj, propName, val);
+            }
+            return val;
+        };
     }
     return nil;
 }

@@ -458,6 +458,12 @@ public extension RealmCollection where Element: AddableType {
     }
 }
 
+public extension RealmCollection where Element: Comparable {
+    public func sorted(ascending: Bool = true) -> Results<Element> {
+        return sorted(byKeyPath: "self", ascending: ascending)
+    }
+}
+
 private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiveCBridgeable {
     typealias Wrapper = AnyRealmCollection<Element>
     typealias Element = T

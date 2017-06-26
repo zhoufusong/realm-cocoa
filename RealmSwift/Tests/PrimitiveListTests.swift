@@ -86,6 +86,56 @@ final class Int64Factory: ValueFactory {
     }
 }
 
+final class FloatFactory: ValueFactory {
+    static func array(_ obj: SwiftListObject) -> List<Float> {
+        return obj.float
+    }
+
+    static func values() -> [Float] {
+        return [1.1, 2.2, 3.3]
+    }
+}
+
+final class DoubleFactory: ValueFactory {
+    static func array(_ obj: SwiftListObject) -> List<Double> {
+        return obj.double
+    }
+
+    static func values() -> [Double] {
+        return [1.1, 2.2, 3.3]
+    }
+}
+
+final class StringFactory: ValueFactory {
+    static func array(_ obj: SwiftListObject) -> List<String> {
+        return obj.string
+    }
+
+    static func values() -> [String] {
+        return ["a", "b", "c"]
+    }
+}
+
+final class DataFactory: ValueFactory {
+    static func array(_ obj: SwiftListObject) -> List<Data> {
+        return obj.data
+    }
+
+    static func values() -> [Data] {
+        return ["a".data(using: .utf8)!, "b".data(using: .utf8)!, "c".data(using: .utf8)!]
+    }
+}
+
+final class DateFactory: ValueFactory {
+    static func array(_ obj: SwiftListObject) -> List<Date> {
+        return obj.date
+    }
+
+    static func values() -> [Date] {
+        return [Date(), Date().addingTimeInterval(10), Date().addingTimeInterval(20)]
+    }
+}
+
 /*
 final class OptionalIntFactory: ValueFactory {
     static func array(_ obj: SwiftListObject) -> List<Int?> {
@@ -93,7 +143,7 @@ final class OptionalIntFactory: ValueFactory {
     }
 
     static func values() -> [Int?] {
-        return [nil, 1, 2, 3]
+        return [1, nil, 2, 3]
     }
 }
 
@@ -138,7 +188,7 @@ final class OptionalInt64Factory: ValueFactory {
 }
 */
 
-class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: TestCase {
+class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
     var realm: Realm!
     var obj: SwiftListObject!
     var array: List<V.T>!
@@ -158,8 +208,13 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: TestCase {
     override func tearDown() {
         realm.cancelWrite()
         realm = nil
-    }
+        array = nil
+        obj = nil
 
+    }
+}
+
+class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> {
     func testInvalidated() {
         XCTAssertFalse(array.isInvalidated)
         if let realm = obj.realm {
@@ -180,6 +235,7 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: TestCase {
     }
 
     func testIndexMatching() {
+        return; // not implemented
         XCTAssertNil(array.index(matching: "self = %@", values[0]))
 
         array.append(values[0])
@@ -191,46 +247,44 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: TestCase {
     }
 
     func testSubscript() {
-
+        array.append(objectsIn: values)
+        for i in 0..<values.count {
+            XCTAssertEqual(array[i], values[i])
+        }
+        assertThrows(array[values.count], "asdf")
+        assertThrows(array[-1], "asdf")
     }
 
     func testFirst() {
-
+        array.append(objectsIn: values)
+        XCTAssertEqual(array.first, values.first)
+        array.removeAll()
+        XCTAssertNil(array.first)
     }
 
     func testLast() {
+        array.append(objectsIn: values)
+        XCTAssertEqual(array.last, values.last)
+        array.removeAll()
+        XCTAssertNil(array.last)
 
     }
 
     func testValueForKey() {
+        XCTAssertEqual(array.value(forKey: "self").count, 0)
+        array.append(objectsIn: values)
+        XCTAssertTrue(array.value(forKey: "self") as [AnyObject] as! [V.T] == values)
 
+        assertThrows(array.value(forKey: "not self"), named: "NSUnknownKeyException")
     }
 
     func testSetValueForKey() {
+        // does this even make any sense?
 
     }
 
     func testFilter() {
-
-    }
-
-    func testSorted() {
-
-    }
-
-    func testMin() {
-
-    }
-
-    func testMax() {
-
-    }
-
-    func testSum() {
-
-    }
-
-    func testAverage() {
+        // not implemented
 
     }
 
@@ -257,11 +311,40 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: TestCase {
     }
 
     func testRemove() {
+        assertThrows(array.remove(at: 0))
+        assertThrows(array.remove(at: -1))
 
+        array.append(objectsIn: values)
+
+        assertThrows(array.remove(at: -1))
+        XCTAssertEqual(values[0], array[0])
+        XCTAssertEqual(values[1], array[1])
+        XCTAssertEqual(values[2], array[2])
+        assertThrows(array[3])
+
+        array.remove(at: 0)
+        XCTAssertEqual(values[1], array[0])
+        XCTAssertEqual(values[2], array[1])
+        assertThrows(array[2])
+        assertThrows(array.remove(at: 2))
+
+        array.remove(at: 1)
+        XCTAssertEqual(values[1], array[0])
+        assertThrows(array[1])
     }
 
     func testRemoveLast() {
+        assertThrows(array.removeLast())
 
+        array.append(objectsIn: values)
+        array.removeLast()
+
+        XCTAssertEqual(array.count, 2)
+        XCTAssertEqual(values[0], array[0])
+        XCTAssertEqual(values[1], array[1])
+
+        array.removeLast(2)
+        XCTAssertEqual(array.count, 0)
     }
 
     func testRemoveAll() {
@@ -281,12 +364,84 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: TestCase {
     }
 }
 
+class MinMaxPrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T: MinMaxType {
+    func testMin() {
+        XCTAssertNil(array.min())
+        array.append(objectsIn: values.reversed())
+        XCTAssertEqual(array.min(), values.first)
+    }
+
+    func testMax() {
+        XCTAssertNil(array.max())
+        array.append(objectsIn: values.reversed())
+        XCTAssertEqual(array.max(), values.last)
+    }
+}
+
+class AddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T: AddableType {
+    func testSum() {
+        XCTAssertEqual(array.sum(), V.T())
+        array.append(objectsIn: values)
+
+        // Expressing "can be added and converted to a floating point type" as
+        // a protocol requirement is awful, so sidestep it all with obj-c
+        let expected = ((values as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
+        let actual: V.T = array.sum()
+        XCTAssertEqualWithAccuracy((actual as! NSNumber).doubleValue, expected, accuracy: 0.01)
+    }
+
+    func testAverage() {
+        XCTAssertNil(array.average())
+        array.append(objectsIn: values)
+
+        let expected = ((values as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber).doubleValue
+        XCTAssertEqualWithAccuracy(array.average()!, expected, accuracy: 0.01)
+
+    }
+}
+
+class SortablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T: Comparable {
+    func testSorted() {
+        var shuffled = values!
+        shuffled.removeFirst()
+        shuffled.append(values!.first!)
+        array.append(objectsIn: shuffled)
+
+        XCTAssertEqual(Array(array.sorted(ascending: true)), values)
+        XCTAssertEqual(Array(array.sorted(ascending: false)), values.reversed())
+    }
+}
+
 func addTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
     _ = PrimitiveListTests<OF, IntFactory>.defaultTestSuite().tests.map(suite.addTest)
     _ = PrimitiveListTests<OF, Int8Factory>.defaultTestSuite().tests.map(suite.addTest)
     _ = PrimitiveListTests<OF, Int16Factory>.defaultTestSuite().tests.map(suite.addTest)
     _ = PrimitiveListTests<OF, Int32Factory>.defaultTestSuite().tests.map(suite.addTest)
     _ = PrimitiveListTests<OF, Int64Factory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, FloatFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, DoubleFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, StringFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, DataFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, DateFactory>.defaultTestSuite().tests.map(suite.addTest)
+
+    _ = MinMaxPrimitiveListTests<OF, IntFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, Int8Factory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, Int16Factory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, Int32Factory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, Int64Factory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, FloatFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, DoubleFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, DateFactory>.defaultTestSuite().tests.map(suite.addTest)
+
+    _ = AddablePrimitiveListTests<OF, IntFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = AddablePrimitiveListTests<OF, Int8Factory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = AddablePrimitiveListTests<OF, Int16Factory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = AddablePrimitiveListTests<OF, Int32Factory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = AddablePrimitiveListTests<OF, Int64Factory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = AddablePrimitiveListTests<OF, FloatFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = AddablePrimitiveListTests<OF, DoubleFactory>.defaultTestSuite().tests.map(suite.addTest)
+
+//    _ = PrimitiveListTests<OF, OptionalIntFactory>.defaultTestSuite().tests.map(suite.addTest)
 }
 
 class UnmanagedPrimitiveListTests: TestCase {
@@ -301,6 +456,17 @@ class ManagedPrimitiveListTests: TestCase {
     override class func defaultTestSuite() -> XCTestSuite {
         let suite = XCTestSuite(name: "Managed Primitive Lists")
         addTests(suite, ManagedObjectFactory.self)
+
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, IntFactory>.defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int8Factory>.defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int16Factory>.defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int32Factory>.defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int64Factory>.defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, FloatFactory>.defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, DoubleFactory>.defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, StringFactory>.defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, DateFactory>.defaultTestSuite().tests.map(suite.addTest)
+
         return suite
     }
 }

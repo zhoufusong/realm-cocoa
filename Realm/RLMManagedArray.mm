@@ -374,8 +374,10 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
         return array;
     }
 
-    translateErrors([&] { _backingList.verify_attached(); });
-    return RLMCollectionValueForKey(self, key);
+    return translateErrors([&] {
+        _backingList.verify_attached();
+        return RLMCollectionValueForKey(_backingList, key, _realm, *_objectInfo);
+    });
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
@@ -394,12 +396,16 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 - (id)aggregate:(NSString *)property
          method:(realm::util::Optional<realm::Mixed> (realm::List::*)(size_t))method
      methodName:(NSString *)methodName {
-    size_t column = _objectInfo->tableColumn(property);
-    auto value = translateErrors([&] { return (_backingList.*method)(column); }, methodName);
-    if (!value) {
-        return nil;
+    size_t column = 0;
+    if (_backingList.get_type() == realm::PropertyType::Object) {
+        column = _objectInfo->tableColumn(property);
     }
-    return RLMMixedToObjc(*value);
+    else if (![property isEqualToString:@"self"]) {
+        @throw RLMException(@"Arrays of '%@' can only be aggregated on \"self\"", RLMTypeToString(_type));
+    }
+
+    auto value = translateErrors([&] { return (_backingList.*method)(column); }, methodName);
+    return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)minOfProperty:(NSString *)property {

@@ -106,13 +106,6 @@ public final class List<T: RealmCollectionValue>: ListBase {
         return index(matching: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
-    private func cast<U, V>(_ value: U, to: V.Type) -> V {
-        if let v = value as? V {
-            return v
-        }
-        return unsafeBitCast(value, to: to)
-    }
-
     // MARK: Object Retrieval
 
     /**
@@ -145,8 +138,8 @@ public final class List<T: RealmCollectionValue>: ListBase {
      Returns an `Array` containing the results of invoking `valueForKey(_:)` using `key` on each of the collection's
      objects.
      */
-    public override func value(forKey key: String) -> Any? {
-        return value(forKeyPath: key)
+    @nonobjc public func value(forKey key: String) -> [AnyObject] {
+        return _rlmArray.value(forKeyPath: key)! as! [AnyObject]
     }
 
     /**
@@ -155,8 +148,8 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
      - parameter keyPath: The key path to the property whose values are desired.
      */
-    public override func value(forKeyPath keyPath: String) -> Any? {
-        return _rlmArray.value(forKeyPath: keyPath)
+    @nonobjc public func value(forKeyPath keyPath: String) -> [AnyObject] {
+        return _rlmArray.value(forKeyPath: keyPath) as! [AnyObject]
     }
 
     /**
@@ -339,7 +332,7 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
      - parameter index: The index at which to remove the object.
      */
-    public func remove(objectAtIndex index: Int) {
+    public func remove(at index: Int) {
         throwForNegativeIndex(index)
         _rlmArray.removeObject(at: UInt(index))
     }
@@ -473,6 +466,38 @@ public final class List<T: RealmCollectionValue>: ListBase {
     }
 }
 
+extension List where Element: MinMaxType {
+    /**
+     Returns the minimum (lowest) value in the list, or `nil` if the list is empty.
+     */
+    public func min() -> Element? {
+        return _rlmArray.min(ofProperty: "self").map(dynamicBridgeCast)
+    }
+
+    /**
+     Returns the maximum (highest) value in the list, or `nil` if the list is empty.
+     */
+    public func max() -> Element? {
+        return _rlmArray.max(ofProperty: "self").map(dynamicBridgeCast)
+    }
+}
+
+extension List where Element: AddableType {
+    /**
+     Returns the sum of the values in the list.
+     */
+    public func sum() -> Element {
+        return sum(ofProperty: "self")
+    }
+
+    /**
+     Returns the average of the values in the list, or `nil` if the list is empty.
+     */
+    public func average() -> Double? {
+        return average(ofProperty: "self")
+    }
+}
+
 extension List: RealmCollection, RangeReplaceableCollection {
     // MARK: Sequence Support
 
@@ -504,7 +529,7 @@ extension List: RealmCollection, RangeReplaceableCollection {
     public func replaceSubrange<C: Collection>(_ subrange: Range<Int>, with newElements: C)
         where C.Iterator.Element == T {
         for _ in subrange.lowerBound..<subrange.upperBound {
-            remove(objectAtIndex: subrange.lowerBound)
+            remove(at: subrange.lowerBound)
         }
         for x in newElements.reversed() {
             insert(x, at: subrange.lowerBound)
@@ -552,39 +577,7 @@ extension List: AssistedObjectiveCBridgeable {
 
 // MARK: Unavailable
 
-extension List where T: Object {
-    @available(*, unavailable, renamed: "append(objectsIn:)")
-    public func appendContentsOf<S: Sequence>(_ objects: S) where S.Iterator.Element == T { fatalError() }
-
-    @available(*, unavailable, renamed: "remove(objectAtIndex:)")
-    public func remove(at index: Int) { fatalError() }
-
-    @available(*, unavailable, renamed: "isInvalidated")
-    public var invalidated: Bool { fatalError() }
-
-    @available(*, unavailable, renamed: "index(matching:)")
-    public func index(of predicate: NSPredicate) -> Int? { fatalError() }
-
-    @available(*, unavailable, renamed: "index(matching:_:)")
-    public func index(of predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
-
-    @available(*, unavailable, renamed: "sorted(byKeyPath:ascending:)")
-    public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
-
-    @available(*, unavailable, renamed: "sorted(by:)")
-    public func sorted<S: Sequence>(_ sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
-        fatalError()
-    }
-
-    @available(*, unavailable, renamed: "min(ofProperty:)")
-    public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
-
-    @available(*, unavailable, renamed: "max(ofProperty:)")
-    public func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
-
-    @available(*, unavailable, renamed: "sum(ofProperty:)")
-    public func sum<U: AddableType>(_ property: String) -> U { fatalError() }
-
-    @available(*, unavailable, renamed: "average(ofProperty:)")
-    public func average<U: AddableType>(_ property: String) -> U? { fatalError() }
+extension List {
+    @available(*, unavailable, renamed: "remove(at:)")
+    public func remove(objectAtIndex: Int) { fatalError() }
 }

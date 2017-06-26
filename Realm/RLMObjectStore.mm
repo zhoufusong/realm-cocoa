@@ -85,14 +85,14 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
     }
 
     for (RLMProperty *prop in object->_objectSchema.swiftGenericProperties) {
-        if (prop.array) {
-            RLMArray *array = [[RLMManagedArray alloc] initWithParent:object property:prop];
-            [object_getIvar(object, prop.swiftIvar) set_rlmArray:array];
-        }
-        else if (prop.type == RLMPropertyTypeLinkingObjects) {
+        if (prop.type == RLMPropertyTypeLinkingObjects) {
             id linkingObjects = object_getIvar(object, prop.swiftIvar);
             [linkingObjects setObject:(id)[[RLMWeakObjectHandle alloc] initWithObject:object]];
             [linkingObjects setProperty:prop];
+        }
+        else if (prop.array) {
+            RLMArray *array = [[RLMManagedArray alloc] initWithParent:object property:prop];
+            [object_getIvar(object, prop.swiftIvar) set_rlmArray:array];
         }
         else {
             RLMOptionalBase *optional = object_getIvar(object, prop.swiftIvar);

@@ -325,6 +325,9 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (NSUInteger)indexOfObject:(id)object {
     validateMatchingObjectType(self, object);
+    if (!_backingArray) {
+        return NSNotFound;
+    }
     if (_type != RLMPropertyTypeObject) {
         return [_backingArray indexOfObject:object];
     }
@@ -436,7 +439,7 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (id)sumOfProperty:(NSString *)property {
     [self validateAggregateProperty:property method:_cmd allowDate:false];
-    return [_backingArray valueForKeyPath:[@"@sum." stringByAppendingString:property]];
+    return [_backingArray valueForKeyPath:[@"@sum." stringByAppendingString:property]] ?: @0;
 }
 
 - (id)averageOfProperty:(NSString *)property {
