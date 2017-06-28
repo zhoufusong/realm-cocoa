@@ -273,12 +273,15 @@ open class Object: RLMObjectBase, ThreadConfined {
      Returns whether two Realm objects are equal.
 
      Objects are considered equal if and only if they are both managed by the same Realm and point to the same
-     underlying object in the database.
+     underlying object in the database. Object comparison only takes place if the object type has a primary key.
 
      - parameter object: The object to compare the receiver to.
      */
-    open override func isEqual(_ object: Any?) -> Bool {
-        return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
+    open override func isEqual(to object: Any?) -> Bool {
+        if let object = object as? Object {
+            return RLMObjectBaseAreEqual(self, object)
+        }
+        return super.isEqual(object)
     }
 
     // MARK: Private functions

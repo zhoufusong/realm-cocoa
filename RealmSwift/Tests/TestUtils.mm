@@ -19,6 +19,7 @@
 #import "TestUtils.h"
 
 #import <Realm/Realm.h>
+#import <Realm/RLMObject_Private.h>
 #import <Realm/RLMSchema_Private.h>
 
 #import "RLMRealmUtil.hpp"
@@ -29,6 +30,14 @@
 __attribute((constructor))
 static void initializeSharedSchema() {
     [RLMSchema sharedSchema];
+}
+
+void RLMAssertEqualTestObjects(XCTestCase *self, RLMObjectBase *o1, RLMObjectBase *o2, NSString *fileName, NSUInteger lineNumber) {
+    if (!RLMObjectBaseAreEqual(o1, o2)) {
+        NSString *msg = [NSString stringWithFormat:@"Objects expected to be equal, but weren't. First: %@, second: %@",
+                         o1, o2];
+        [self recordFailureWithDescription:msg inFile:fileName atLine:lineNumber expected:NO];
+    }
 }
 
 void RLMAssertThrowsWithName(XCTestCase *self, dispatch_block_t block, NSString *name, NSString *message, NSString *fileName, NSUInteger lineNumber) {

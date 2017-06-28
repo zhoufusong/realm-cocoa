@@ -294,14 +294,14 @@ class ObjectTests: TestCase {
 
         let boolObject = SwiftBoolObject(value: [true])
         setter(object, boolObject, "objectCol")
-        XCTAssertEqual(getter(object, "objectCol") as? SwiftBoolObject, boolObject)
+        assertEqual(getter(object, "objectCol") as? SwiftBoolObject, boolObject)
         XCTAssertEqual((getter(object, "objectCol") as! SwiftBoolObject).boolCol, true)
 
         let list = List<SwiftBoolObject>()
         list.append(boolObject)
         setter(object, list, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 1)
-        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
+        assertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
 
         list.removeAll()
         setter(object, list, "arrayCol")
@@ -309,7 +309,7 @@ class ObjectTests: TestCase {
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 1)
-        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
+        assertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
 
         setter(object, nil, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
@@ -345,12 +345,12 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "dateCol") as! Date), Date(timeIntervalSince1970: 333))
 
         setter(object, boolObject, "objectCol")
-        XCTAssertEqual((getter(object, "objectCol") as! DynamicObject), boolObject)
+        assertEqual((getter(object, "objectCol") as! DynamicObject), boolObject)
         XCTAssertEqual(((getter(object, "objectCol") as! DynamicObject)["boolCol"] as! Bool), true)
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)
-        XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
+        assertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
 
         let list = getter(object, "arrayCol") as! List<DynamicObject>
         list.removeAll()
@@ -359,7 +359,7 @@ class ObjectTests: TestCase {
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)
-        XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
+        assertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
 
         setter(object, nil, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 0)
@@ -441,8 +441,8 @@ class ObjectTests: TestCase {
         }
         let dynamicArray = arrayObject.dynamicList("array")
         XCTAssertEqual(dynamicArray.count, 2)
-        XCTAssertEqual(dynamicArray[0], str1)
-        XCTAssertEqual(dynamicArray[1], str2)
+        assertEqual(dynamicArray[0], str1)
+        assertEqual(dynamicArray[1], str2)
         XCTAssertEqual(arrayObject.dynamicList("intArray").count, 0)
         assertThrows(arrayObject.dynamicList("noSuchList"))
     }
