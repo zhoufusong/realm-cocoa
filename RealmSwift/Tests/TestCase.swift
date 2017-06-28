@@ -119,7 +119,7 @@ class TestCase: XCTestCase {
         RLMAssertEqualTestObjects(self, o1, o2, fileName, lineNumber)
     }
 
-    /// Check whether two collections containing the same test object element type are equal.
+    /// Check whether two collections containing Realm objects are equal.
     func assertEqualObjectCollections<T : Collection, U : Collection>(_ c1: T, _ c2: U, fileName: String = #file, lineNumber: UInt = #line)
         where T.Iterator.Element : Object,
         U.Iterator.Element : Object,
