@@ -18,12 +18,11 @@
 
 #import "RLMSyncSessionRefreshHandle.hpp"
 
-#import "RLMAuthResponseModel.h"
+#import "RLMJSONModels.h"
 #import "RLMNetworkClient.h"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
-#import "RLMTokenModels.h"
 #import "RLMUtil.hpp"
 
 #import "sync/sync_session.hpp"

@@ -44,30 +44,26 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return [NSURLSession sharedSession];
 }
 
-+ (NSURL *)urlForServer:(NSURL *)serverURL endpoint:(RLMServerEndpoint)endpoint {
++ (NSURL *)urlForServer:(NSURL *)serverURL endpoint:(RLMServerEndpoint)endpoint json:(NSDictionary *)json {
     NSString *pathComponent = nil;
     switch (endpoint) {
         case RLMServerEndpointAuth:
             pathComponent = @"auth";
             break;
-        case RLMServerEndpointLogout:
-            // TODO: fix this
-            pathComponent = @"logout";
-            NSAssert(NO, @"logout endpoint isn't implemented yet, don't use it");
-            break;
-        case RLMServerEndpointAddCredentials:
-            // TODO: fix this
-            pathComponent = @"addCredentials";
-            NSAssert(NO, @"add credentials endpoint isn't implemented yet, don't use it");
-            break;
-        case RLMServerEndpointRemoveCredentials:
-            // TODO: fix this
-            pathComponent = @"removeCredentials";
-            NSAssert(NO, @"remove credentials endpoint isn't implemented yet, don't use it");
-            break;
         case RLMServerEndpointChangePassword:
             pathComponent = @"auth/password";
             break;
+        case RLMServerEndpointGetUserInfo: {
+            NSString *provider = json[kRLMSyncProviderKey];
+            NSString *providerID = json[kRLMSyncProviderIDKey];
+            NSAssert([provider isKindOfClass:[NSString class]] && [providerID isKindOfClass:[NSString class]],
+                     @"malformed request; this indicates a logic error in the binding.");
+            NSCharacterSet *allowed = [NSCharacterSet URLQueryAllowedCharacterSet];
+            pathComponent = [NSString stringWithFormat:@"api/providers/%@/accounts/%@",
+                             [provider stringByAddingPercentEncodingWithAllowedCharacters:allowed],
+                             [providerID stringByAddingPercentEncodingWithAllowedCharacters:allowed]];
+            break;
+        }
     }
     NSAssert(pathComponent != nil, @"Unrecognized value for RLMServerEndpoint enum");
     return [serverURL URLByAppendingPathComponent:pathComponent];
@@ -118,7 +114,9 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     }
 
     // Create the request
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self urlForServer:serverURL endpoint:endpoint]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self urlForServer:serverURL
+                                                                                 endpoint:endpoint
+                                                                                     json:jsonDictionary]];
     request.HTTPBody = jsonData;
     request.HTTPMethod = httpMethod;
     request.timeoutInterval = MAX(timeout, 10);

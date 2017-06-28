@@ -18,7 +18,7 @@
 
 #import "RLMSyncUser_Private.hpp"
 
-#import "RLMAuthResponseModel.h"
+#import "RLMJSONModels.h"
 #import "RLMNetworkClient.h"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
@@ -28,7 +28,6 @@
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncSessionRefreshHandle.hpp"
 #import "RLMSyncUtil_Private.hpp"
-#import "RLMTokenModels.h"
 #import "RLMUtil.hpp"
 
 #import "sync/sync_manager.hpp"
@@ -110,6 +109,17 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         }
     };
 }
+
+@interface RLMSyncUserInfo ()
+
+@property (nonatomic, readwrite) RLMIdentityProvider provider;
+@property (nonatomic, readwrite) NSString *providerID;
+@property (nonatomic, readwrite) NSString *identity;
+@property (nonatomic, readwrite) BOOL isAdmin;
+
++ (instancetype)syncUserInfoWithModel:(RLMUserResponseModel *)model;
+
+@end
 
 @interface RLMSyncUser () {
     std::shared_ptr<SyncUser> _user;
@@ -281,13 +291,42 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     [RLMNetworkClient sendRequestToEndpoint:RLMServerEndpointChangePassword
                                  httpMethod:@"PUT"
                                      server:self.authenticationServer
-                                       JSON:@{@"token": self._refreshToken,
+                                       JSON:@{kRLMSyncTokenKey: self._refreshToken,
                                               @"user_id": userID,
                                               @"password": newPassword}
                                     timeout:60
                                  completion:^(NSError *error, __unused NSDictionary *json) {
         completion(error);
     }];
+}
+
+#pragma mark - Administrator API
+
+- (void)retrieveUserInfoForProvider:(RLMIdentityProvider)provider
+                   providerIdentity:(NSString *)providerID
+                         completion:(RLMRetrieveUserBlock)completion {
+    [RLMNetworkClient sendRequestToEndpoint:RLMServerEndpointGetUserInfo
+                                 httpMethod:@"GET"
+                                     server:self.authenticationServer
+#warning TODO: make sure that this is actually correct
+                                       JSON:@{
+                                              kRLMSyncProviderKey: provider,
+                                              kRLMSyncProviderIDKey: providerID,
+                                              kRLMSyncTokenKey: self._refreshToken
+                                              }
+                                    timeout:60
+                                 completion:^(NSError *error, NSDictionary *json) {
+                                     if (error) {
+                                         completion(nil, error);
+                                         return;
+                                     }
+                                     RLMUserResponseModel *model = [[RLMUserResponseModel alloc] initWithDictionary:json];
+                                     if (!model) {
+                                         completion(nil, make_auth_error_bad_response(json));
+                                         return;
+                                     }
+                                     completion([RLMSyncUserInfo syncUserInfoWithModel:model], nil);
+                                 }];
 }
 
 #pragma mark - Permissions API
@@ -414,6 +453,25 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     }
     user->_user = sync_user;
     completion(user, nil);
+}
+
+@end
+
+#pragma mark - RLMSyncUserInfo
+
+@implementation RLMSyncUserInfo
+
+- (instancetype)initPrivate {
+    return [super init];
+}
+
++ (instancetype)syncUserInfoWithModel:(RLMUserResponseModel *)model {
+    RLMSyncUserInfo *info = [[RLMSyncUserInfo alloc] initPrivate];
+    info.provider = model.provider;
+    info.providerID = model.providerID;
+    info.isAdmin = model.isAdmin;
+    info.identity = model.identity;
+    return info;
 }
 
 @end
