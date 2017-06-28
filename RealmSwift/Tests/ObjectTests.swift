@@ -595,4 +595,61 @@ class ObjectTests: TestCase {
         waitForExpectations(timeout: 2)
         token.stop()
     }
+
+    func testEqualityForObjectTypeWithPrimaryKey() {
+        let realm = try! Realm()
+        let pk = "123456"
+
+        let testObject = SwiftPrimaryStringObject()
+        testObject.stringCol = pk
+        testObject.intCol = 12345
+
+        let unmanaged = SwiftPrimaryStringObject()
+        unmanaged.stringCol = pk
+        unmanaged.intCol = 12345
+
+        let otherObject = SwiftPrimaryStringObject()
+        otherObject.stringCol = "not" + pk
+        otherObject.intCol = 12345
+
+        try! realm.write {
+            realm.add([testObject, otherObject])
+        }
+
+        // Should not match an object that's not equal.
+        XCTAssertNotEqual(testObject, otherObject)
+
+        // Should not match an object whose fields are equal if it's not the same row in the database.
+        XCTAssertNotEqual(testObject, unmanaged)
+
+        // Should match an object that represents the same row.
+        let retrievedObject = realm.object(ofType: SwiftPrimaryStringObject.self, forPrimaryKey: pk)!
+        XCTAssertEqual(testObject, retrievedObject)
+        XCTAssertEqual(testObject.hash, retrievedObject.hash)
+        XCTAssertTrue(testObject.isEqual(to: retrievedObject))
+    }
+
+    func testEqualityForObjectTypeWithoutPrimaryKey() {
+        let realm = try! Realm()
+        let pk = "123456"
+        XCTAssertNil(SwiftStringObject.primaryKey())
+
+        let testObject = SwiftStringObject()
+        testObject.stringCol = pk
+
+        let alias = testObject
+
+        try! realm.write {
+            realm.add(testObject)
+        }
+
+        XCTAssertEqual(testObject, alias)
+
+        // Should not match an object even if it represents the same row.
+        let retrievedObject = realm.objects(SwiftStringObject.self).first!
+        XCTAssertNotEqual(testObject, retrievedObject)
+
+        // Should be able to use `isEqual(to:)` to check if same row in the database.
+        XCTAssertTrue(testObject.isEqual(to: retrievedObject))
+    }
 }
