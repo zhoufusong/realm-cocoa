@@ -39,6 +39,4 @@ FOUNDATION_EXTERN void RLMAssertMatches(XCTestCase *self, __attribute__((noescap
 
 FOUNDATION_EXTERN bool RLMHasCachedRealmForPath(NSString *path);
 
-FOUNDATION_EXTERN void RLMAssertEqualTestObjects(XCTestCase *self, RLMObjectBase * _Nullable o1, RLMObjectBase * _Nullable o2, NSString *fileName, NSUInteger lineNumber);
-
 NS_ASSUME_NONNULL_END

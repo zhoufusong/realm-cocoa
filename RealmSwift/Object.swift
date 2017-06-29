@@ -268,7 +268,7 @@ open class Object: RLMObjectBase, ThreadConfined {
     }
 
     // MARK: Equatable
-
+#if os(macOS)
     /**
      Returns whether two Realm objects are equal.
 
@@ -277,11 +277,18 @@ open class Object: RLMObjectBase, ThreadConfined {
 
      - parameter object: The object to compare the receiver to.
      */
-#if os(macOS)
     open override func isEqual(to object: Any?) -> Bool {
         return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
     }
 #else
+    /**
+     Returns whether two Realm objects are equal.
+
+     Objects are considered equal if and only if they are both managed by the same Realm and point to the same
+     underlying object in the database.
+
+     - parameter object: The object to compare the receiver to.
+     */
     open func isEqual(to object: Any?) -> Bool {
         return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
     }
