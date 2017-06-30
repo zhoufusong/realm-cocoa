@@ -74,6 +74,16 @@ public typealias UserCompletionBlock = RLMUserCompletionBlock
  */
 public typealias SyncError = RLMSyncError
 
+extension SyncError {
+    /**
+     An opaque token allowing the user to take action after certain types of
+     errors have been reported.
+
+     - see: `RLMSyncErrorActionToken`
+     */
+    public typealias ActionToken = RLMSyncErrorActionToken
+}
+
 /**
  An error associated with network requests made to the authentication server. This type of error
  may be returned in the callback block to `SyncUser.logIn()` upon certain types of failed login
@@ -113,19 +123,29 @@ public typealias SyncManagementObjectStatus = RLMSyncManagementObjectStatus
 public typealias Provider = RLMIdentityProvider
 
 public extension SyncError {
-    /// Given a client reset error, extract and return the recovery file path and the reset closure.
-    public func clientResetInfo() -> (String, () -> Void)? {
+    /**
+     Given a client reset error, extract and return the recovery file path
+     and the action token.
+     
+     - see: `SyncError.ActionToken`, `SyncSession.immediatelyHandleError(_:)`
+     */
+    public func clientResetInfo() -> (String, SyncError.ActionToken)? {
         if code == SyncError.clientResetError,
             let recoveryPath = userInfo[kRLMSyncPathOfRealmBackupCopyKey] as? String,
-            let block = _nsError.__rlmSync_clientResetBlock() {
-            return (recoveryPath, block)
+            let token = _nsError.__rlmSync_errorActionToken() {
+            return (recoveryPath, token)
         }
         return nil
     }
 
-    /// Given a permission denied error, extract and return the reset closure.
-    public func deleteRealmUserInfo() -> (() -> Void)? {
-        return _nsError.__rlmSync_deleteRealmBlock()
+    /**
+     Given a permission denied error, extract and return the recovery file path
+     and the action token.
+
+     - see: `SyncError.ActionToken`, `SyncSession.immediatelyHandleError(_:)`
+     */
+    public func deleteRealmUserInfo() -> SyncError.ActionToken? {
+        return _nsError.__rlmSync_errorActionToken()
     }
 }
 
